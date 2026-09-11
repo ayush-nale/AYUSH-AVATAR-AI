@@ -142,56 +142,53 @@ export function useLiveVoice(avatarId: AvatarId | string, onVolumeChange: (vol: 
                       }
                    }
                 }
+             }
 
-                // Gemini 2.0 Live API sometimes returns toolCall at the top level
-                const topToolCall = data.toolCall || sc.toolCall;
-                if (topToolCall) {
-                   // Check top-level toolCall from LiveServerMessage
-                   if (topToolCall.functionCalls) {
-                     topToolCall.functionCalls.forEach((call: any) => {
-                       if (call.name === "set_expression" && call.args && call.args.expression) {
-                         if (onExpressionChange) {
-                           onExpressionChange(String(call.args.expression).toLowerCase());
-                         }
-                       }
-                     });
-                     
-                     // Respond to the top-level toolCall
-                     if (sessionRef.current && sessionRef.current.sendToolResponse) {
-                        try {
-                           const functionResponses = topToolCall.functionCalls.map((call: any) => ({
-                              id: call.id,
-                              name: call.name,
-                              response: { result: "ok" }
-                           }));
-                           sessionRef.current.sendToolResponse({ functionResponses });
-                        } catch(e: any) { 
-                           console.error("Tool response error:", e);
-                           window.alert("Tool response error (2): " + e.message);
-                        }
+             // Gemini 2.0 Live API returns toolCall at the top level, or inside serverContent
+             const topToolCall = data.toolCall || (data.serverContent && data.serverContent.toolCall);
+             if (topToolCall) {
+                if (topToolCall.functionCalls) {
+                  topToolCall.functionCalls.forEach((call: any) => {
+                    if (call.name === "set_expression" && call.args && call.args.expression) {
+                      if (onExpressionChange) {
+                        onExpressionChange(String(call.args.expression).toLowerCase());
+                      }
+                    }
+                  });
+                  
+                  // Respond to the top-level toolCall
+                  if (sessionRef.current && sessionRef.current.sendToolResponse) {
+                     try {
+                        const functionResponses = topToolCall.functionCalls.map((call: any) => ({
+                           id: call.id,
+                           name: call.name,
+                           response: { result: "ok" }
+                        }));
+                        sessionRef.current.sendToolResponse({ functionResponses });
+                     } catch(e: any) { 
+                        console.error("Tool response error:", e);
                      }
-                   } else {
-                     const args = topToolCall.args || {};
-                     if (args.expression && onExpressionChange) {
-                       onExpressionChange(String(args.expression).toLowerCase());
+                  }
+                } else {
+                  const args = topToolCall.args || {};
+                  if (args.expression && onExpressionChange) {
+                    onExpressionChange(String(args.expression).toLowerCase());
+                  }
+                  
+                  // Respond to the top-level toolCall
+                  if (sessionRef.current && sessionRef.current.sendToolResponse) {
+                     try {
+                        sessionRef.current.sendToolResponse({
+                          functionResponses: [{
+                            id: topToolCall.id || "0",
+                            name: topToolCall.name || "set_expression",
+                            response: { result: "ok" }
+                          }]
+                        });
+                     } catch (e: any) { 
+                        console.error("Tool response error:", e);
                      }
-                     
-                     // Respond to the top-level toolCall
-                     if (sessionRef.current && sessionRef.current.sendToolResponse) {
-                        try {
-                           sessionRef.current.sendToolResponse({
-                             functionResponses: [{
-                               id: topToolCall.id,
-                               name: "set_expression", // Best guess
-                               response: { success: true }
-                             }]
-                           });
-                        } catch (e: any) { 
-                           console.error("Tool response error:", e);
-                           window.alert("Tool response error (3): " + e.message);
-                        }
-                     }
-                   }
+                  }
                 }
              }
           },
@@ -231,7 +228,7 @@ export function useLiveVoice(avatarId: AvatarId | string, onVolumeChange: (vol: 
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {
-                voiceName: avatarId === "ayush" ? "Charon" : avatarId === "girl" ? "Aoede" : "Puck"
+                voiceName: avatarId === "ayush" ? "Charon" : avatarId === "xalia" ? "Kore" : "Puck"
               }
             }
           }
@@ -254,8 +251,9 @@ export function useLiveVoice(avatarId: AvatarId | string, onVolumeChange: (vol: 
           // Convert Int16Array to base64
           const uint8 = new Uint8Array(pcm.buffer);
           let binary = '';
-          for (let i = 0; i < uint8.length; i++) {
-            binary += String.fromCharCode(uint8[i]);
+          const chunkSize = 8192;
+          for (let i = 0; i < uint8.length; i += chunkSize) {
+            binary += String.fromCharCode.apply(null, uint8.subarray(i, i + chunkSize) as any);
           }
           const b64 = btoa(binary);
           

@@ -133,7 +133,10 @@ export default function Dashboard({ user, displayName, initialConversations }: {
            
            if (audioRef.current) audioRef.current.pause();
            const audio = new Audio(url);
-           audio.playbackRate = avatarId === "robot" ? 0.7 : 1.0;
+           audio.playbackRate = avatarId === "robot" ? 0.7 : avatarId === "ayush" ? 0.85 : 1.0;
+           if ('preservesPitch' in audio) {
+             (audio as any).preservesPitch = false; // Forces pitch to drop with speed, creating a deeper male voice
+           }
            audio.crossOrigin = "anonymous";
            audioRef.current = audio;
            
@@ -295,6 +298,8 @@ export default function Dashboard({ user, displayName, initialConversations }: {
           conversationId={conversationId} 
           onSelectConversation={selectConversation} 
           onNewConversation={newConversation} 
+          avatarId={avatarId}
+          setAvatarId={setAvatarId}
         />
       )}
       
@@ -310,29 +315,6 @@ export default function Dashboard({ user, displayName, initialConversations }: {
 
         <div style={{ position: "absolute", top: "24px", right: "24px", zIndex: 100, display: "flex", gap: "24px", alignItems: "center" }}>
           
-          <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", borderRadius: "20px", padding: "4px" }}>
-            {(["ayush", "girl", "robot"] as AvatarId[]).map((id) => (
-              <button
-                key={id}
-                onClick={() => setAvatarId(id)}
-                style={{
-                  background: avatarId === id ? "rgba(168, 85, 247, 0.4)" : "transparent",
-                  border: "none",
-                  borderRadius: "16px",
-                  padding: "6px 12px",
-                  color: avatarId === id ? "#fff" : "var(--text-dim)",
-                  cursor: "pointer",
-                  fontSize: "13px",
-                  textTransform: "capitalize",
-                  transition: "all 0.2s",
-                  fontWeight: 500
-                }}
-              >
-                {id === "ayush" ? "👦 Ayush" : id === "girl" ? "👧 Girl" : "🤖 Robot"}
-              </button>
-            ))}
-          </div>
-
           {voiceMode && (
             <div style={{ color: sessionState === "connected" ? "#10b981" : sessionState === "error" ? "#ef4444" : "var(--text-dim)", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "6px" }}>
               <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: sessionState === "connected" ? "#10b981" : sessionState === "error" ? "#ef4444" : "var(--text-dim)", animation: sessionState === "connected" ? "pulse 2s infinite" : "none" }}></div>

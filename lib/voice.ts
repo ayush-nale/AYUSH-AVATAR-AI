@@ -5,13 +5,13 @@ export type AudioResult = { audio: ArrayBuffer; contentType: string };
 export async function generateSpeech(text: string, avatarId?: string): Promise<AudioResult> {
   let openaiVoice = env.OPENAI_TTS_VOICE;
   if (avatarId === "ayush") openaiVoice = "onyx";
-  else if (avatarId === "girl") openaiVoice = "nova";
+  else if (avatarId === "xalia") openaiVoice = "nova";
   else if (avatarId === "robot") openaiVoice = "echo";
 
   if (env.ELEVENLABS_API_KEY) {
     let elVoice = env.ELEVENLABS_VOICE_ID || "pNInz6obpgDQGcFmaJcg"; // Adam
     if (avatarId === "ayush") elVoice = "pNInz6obpgDQGcFmaJcg"; // Adam
-    else if (avatarId === "girl") elVoice = "EXAVITQu4vr4xnSDxMaL"; // Bella
+    else if (avatarId === "xalia") elVoice = "EXAVITQu4vr4xnSDxMaL"; // Bella
     else if (avatarId === "robot") elVoice = "ErXwobaYiN019PkySvjV"; // Antoni
 
     const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(elVoice)}?output_format=mp3_44100_128`, {
@@ -38,8 +38,8 @@ export async function generateSpeech(text: string, avatarId?: string): Promise<A
   // StreamElements TTS (Free Amazon Polly) for distinct voices
   let seVoice = "Matthew";
   if (avatarId === "ayush") seVoice = "Matthew";
-  else if (avatarId === "girl") seVoice = "Salli";
-  else if (avatarId === "robot") seVoice = "Justin";
+  else if (avatarId === "xalia") seVoice = "Joanna"; // Soft female voice
+  else if (avatarId === "robot") seVoice = "Brian"; // Distinct British male voice
   
   try {
     const seUrl = `https://api.streamelements.com/kappa/v2/speech?voice=${seVoice}&text=${encodeURIComponent(text.slice(0, 500))}`;
@@ -52,12 +52,12 @@ export async function generateSpeech(text: string, avatarId?: string): Promise<A
   }
 
   // Free Fallback: Google Translate TTS
-  let lang = "en-gb";
-  if (avatarId === "ayush") lang = "en-gb";
-  else if (avatarId === "girl") lang = "en-us";
-  else if (avatarId === "robot") lang = "en-au";
+  let lang = "en-us"; 
+  if (avatarId === "ayush") lang = "en-us"; // Try en-us as it often defaults to male
+  else if (avatarId === "xalia") lang = "en-gb"; // Usually defaults to female
+  else if (avatarId === "robot") lang = "en-ie"; 
 
-  const fallbackUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodeURIComponent(text.slice(0, 200))}`;
+  const fallbackUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=gtx&q=${encodeURIComponent(text.slice(0, 200))}`;
   const response = await fetch(fallbackUrl, { 
     cache: "no-store",
     headers: {

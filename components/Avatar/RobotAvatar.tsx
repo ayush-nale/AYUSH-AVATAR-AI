@@ -61,19 +61,57 @@ export default function RobotAvatar({
        // Blink logic for robot
        const isBlinking = Math.sin(t * 15) > 0.98;
        const scaleY = isBlinking ? 0.1 : 1;
-       leftEye.current.scale.y += (scaleY - leftEye.current.scale.y) * delta * 30;
-       rightEye.current.scale.y += (scaleY - rightEye.current.scale.y) * delta * 30;
-       
-       if (state === "error") {
-         (leftEye.current.material as any).color.set("#ff1744");
-         (rightEye.current.material as any).color.set("#ff1744");
-       } else if (state === "listening") {
-         (leftEye.current.material as any).color.set("#76ff03");
-         (rightEye.current.material as any).color.set("#76ff03");
-       } else {
-         (leftEye.current.material as any).color.set("#00e5ff");
-         (rightEye.current.material as any).color.set("#00e5ff");
+
+       let eyeScaleY = scaleY;
+       let eyeScaleX = 1;
+       let eyeRotZ = 0;
+       let eyeColor = "#00e5ff"; // default cyan
+
+       // Handle expressions
+       if (expression === "happy") {
+           eyeScaleY = scaleY * 0.5;
+           eyeColor = "#76ff03"; // green
+       } else if (expression === "sad") {
+           eyeScaleY = scaleY * 0.8;
+           eyeRotZ = 0.15; // tilt downwards
+           eyeColor = "#2979ff"; // blue
+       } else if (expression === "angry") {
+           eyeScaleY = scaleY * 0.7;
+           eyeRotZ = -0.15; // tilt inwards
+           eyeColor = "#ff1744"; // red
+       } else if (expression === "surprised") {
+           eyeScaleY = scaleY * 1.5;
+           eyeScaleX = 1.2;
+           eyeColor = "#ffea00"; // yellow
+       } else if (expression === "thinking") {
+           eyeScaleY = scaleY * 0.6;
+           eyeScaleX = 0.8;
+           eyeColor = "#b388ff"; // purple
+       } else if (expression === "confused") {
+           eyeScaleY = scaleY * 0.8;
+           eyeRotZ = -0.1;
+           eyeColor = "#ffb300"; // orange
        }
+
+       // Override color based on system state
+       if (state === "error") {
+         eyeColor = "#ff1744";
+       } else if (state === "listening") {
+         eyeColor = "#76ff03";
+       }
+
+       // Apply smoothed transforms
+       leftEye.current.scale.y += (eyeScaleY - leftEye.current.scale.y) * delta * 30;
+       rightEye.current.scale.y += (eyeScaleY - rightEye.current.scale.y) * delta * 30;
+       
+       leftEye.current.scale.x += (eyeScaleX - leftEye.current.scale.x) * delta * 30;
+       rightEye.current.scale.x += (eyeScaleX - rightEye.current.scale.x) * delta * 30;
+       
+       leftEye.current.rotation.z += (eyeRotZ - leftEye.current.rotation.z) * delta * 15;
+       rightEye.current.rotation.z += (-eyeRotZ - rightEye.current.rotation.z) * delta * 15;
+       
+       (leftEye.current.material as any).color.set(eyeColor);
+       (rightEye.current.material as any).color.set(eyeColor);
     }
   });
 

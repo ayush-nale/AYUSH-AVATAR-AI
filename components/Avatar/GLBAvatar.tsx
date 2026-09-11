@@ -102,10 +102,10 @@ export default function GLBAvatar({
       };
 
       const expressionValue = exp || "neutral";
-      if (expressionValue === "happy" || expressionValue === "joy" || expressionValue === "fun") {
+      if (expressionValue === "happy") {
         applyTarget(["mouthSmileLeft", "mouthSmileRight"], 1.0);
         applyTarget(["browInnerUp"], 0.4);
-      } else if (expressionValue === "sad" || expressionValue === "sorrow") {
+      } else if (expressionValue === "sad") {
         applyTarget(["mouthFrownLeft", "mouthFrownRight"], 1.0);
         applyTarget(["browOuterUpLeft", "browOuterUpRight"], 0.6);
       } else if (expressionValue === "angry") {
@@ -131,7 +131,7 @@ export default function GLBAvatar({
     // Head movement
     if (headBone) {
       const initial = initialRotations.get(headBone.name);
-      let targetRotX = initial ? initial.x : 0; 
+      let targetRotX = (initial ? initial.x : 0) + 0.15; 
       let targetRotY = initial ? initial.y : 0;
       let targetRotZ = initial ? initial.z : 0;
       

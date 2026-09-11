@@ -24,7 +24,7 @@ export default function AvatarRenderer({
     return <RobotAvatar state={state} expression={expression} lipSyncRef={lipSyncRef} />;
   }
 
-  if (avatarId === "girl") {
+  if (avatarId === "xalia") {
     // Currently using the ayush model as a placeholder until user uploads girl.glb
     return <GLBAvatar state={state} expression={expression} lipSyncRef={lipSyncRef} url="/avatar/girl.glb" />;
   }

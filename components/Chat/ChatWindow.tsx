@@ -22,34 +22,7 @@ export default function ChatWindow({ messages, error, onSuggestionClick, display
           <p style={{ color: "var(--muted)", fontSize: "16px", margin: 0 }}>what are we working on today?</p>
         </div>
         
-        <div style={{ display: "flex", gap: "12px", marginTop: "32px", overflowX: "auto", paddingBottom: "12px", width: "100%" }} className="scrollbar">
-          {[
-            { icon: "💡", text: "Explain quick sort" },
-            { icon: "🚀", text: "Help me build an AI project" },
-            { icon: "📚", text: "Create a study plan" },
-            { icon: "💻", text: "Help me with coding" }
-          ].map(s => (
-            <button 
-              key={s.text}
-              onClick={() => onSuggestionClick(s.text)}
-              className="focus-ring"
-              style={{ 
-                flex: "0 0 auto",
-                padding: "12px 20px", 
-                borderRadius: "20px",
-                border: "1px solid rgba(168, 85, 247, 0.3)", 
-                display: "flex", alignItems: "center", gap: "10px", 
-                background: "rgba(10, 8, 20, 0.6)", 
-                cursor: "pointer", transition: "all 0.2s" 
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = "rgba(168, 85, 247, 0.15)"}
-              onMouseLeave={(e) => e.currentTarget.style.background = "rgba(10, 8, 20, 0.6)"}
-            >
-              <span style={{ fontSize: "16px" }}>{s.icon}</span>
-              <span style={{ color: "var(--text)", fontSize: "13px", fontWeight: 500, whiteSpace: "nowrap" }}>{s.text}</span>
-            </button>
-          ))}
-        </div>
+
       </div>
     );
   }
