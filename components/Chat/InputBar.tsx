@@ -19,9 +19,9 @@ export default function InputBar({
   inputRef?: RefObject<HTMLInputElement | null>;
 }) {
   return (
-    <div style={{ width: "100%", maxWidth: "800px", margin: "0 auto", padding: "0 24px" }}>
+    <div className="input-bar-container" style={{ width: "100%", maxWidth: "800px", margin: "0 auto", padding: "0 24px" }}>
       <div 
-        className="glass-panel"
+        className="glass-panel input-bar-inner"
         style={{ 
           display: "flex", 
           alignItems: "center", 
@@ -33,7 +33,7 @@ export default function InputBar({
           boxShadow: "0 8px 32px rgba(157, 78, 221, 0.15)"
         }}
       >
-        <button className="focus-ring" style={{ width: "44px", height: "44px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", color: "var(--muted)", transition: "all 0.2s" }}>
+        <button className="focus-ring input-bar-btn" style={{ width: "44px", height: "44px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", color: "var(--muted)", transition: "all 0.2s" }}>
           <span style={{ fontSize: "20px", opacity: 0.8 }}>📎</span>
         </button>
         
@@ -64,7 +64,7 @@ export default function InputBar({
             onListeningChange={onListeningChange}
           />
           <button 
-            className="focus-ring" 
+            className="focus-ring input-bar-btn" 
             onClick={onSend} 
             disabled={loading || !input.trim()} 
             style={{ 

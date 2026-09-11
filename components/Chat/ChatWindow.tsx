@@ -41,6 +41,7 @@ export default function ChatWindow({ messages, error, onSuggestionClick, display
             
             <div style={{ display: "flex", flexDirection: "column", alignItems: isUser ? "flex-end" : "flex-start" }}>
               <div 
+                className="chat-msg-bubble"
                 style={{
                   maxWidth: "100%",
                   padding: "16px 20px",

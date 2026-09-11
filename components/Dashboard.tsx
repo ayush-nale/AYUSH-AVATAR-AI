@@ -345,7 +345,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
         <div className="dashboard-controls-right" style={{ position: "absolute", top: "24px", right: "24px", zIndex: 100, display: "flex", gap: "24px", alignItems: "center" }}>
           
           {voiceMode && (
-            <div style={{ color: sessionState === "connected" ? "#10b981" : sessionState === "error" ? "#ef4444" : "var(--text-dim)", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "6px" }}>
+            <div className="voice-mode-status" style={{ color: sessionState === "connected" ? "#10b981" : sessionState === "error" ? "#ef4444" : "var(--text-dim)", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "6px" }}>
               <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: sessionState === "connected" ? "#10b981" : sessionState === "error" ? "#ef4444" : "var(--text-dim)", animation: sessionState === "connected" ? "pulse 2s infinite" : "none" }}></div>
               {sessionState === "connected" ? "Live" : sessionState === "connecting" ? "Connecting..." : sessionState === "error" ? "Connection Error" : ""}
             </div>
@@ -371,7 +371,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
         <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: "100%", zIndex: 10 }}>
           {messages.length === 0 && !voiceMode && <Hero />}
           
-          <div style={{ position: "absolute", zIndex: 5, width: "100%", height: "100%", transform: voiceMode ? "scale(1.1) translateY(5vh)" : "none", transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)" }}>
+          <div className={`avatar-stage-container ${voiceMode ? 'voice-active' : ''}`} style={{ position: "absolute", zIndex: 5, width: "100%", height: "100%", transform: voiceMode ? "scale(1.1) translateY(5vh)" : "none", transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)" }}>
             <AvatarStage state={appState} expression={expression} lipSyncRef={lipSyncRef} avatarId={avatarId} />
           </div>
         </div>

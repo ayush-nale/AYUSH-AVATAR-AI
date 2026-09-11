@@ -200,4 +200,44 @@ button { cursor: pointer; }
   .chat-panel-zone.has-messages {
     height: 60% !important;
   }
+  
+  .dashboard-controls-right {
+    gap: 8px !important;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 50vw; /* Prevent collision with left controls */
+  }
+  .dashboard-controls-right button {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+  
+  .voice-mode-status {
+    font-size: 10px !important;
+  }
+  
+  .avatar-stage-container.voice-active {
+    transform: scale(1.0) translateY(5vh) !important;
+  }
+
+  .input-bar-container {
+    padding: 0 4px !important;
+  }
+  .input-bar-inner {
+    padding: 4px 8px !important;
+    gap: 8px !important;
+  }
+  .input-bar-btn {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 14px !important;
+  }
+  
+  .chat-panel-zone {
+    padding: 12px !important;
+  }
+  .chat-msg-bubble {
+    padding: 10px 14px !important;
+    font-size: 14px !important;
+  }
 }
