@@ -9,6 +9,8 @@ import AvatarStage from "@/components/dashboard/AvatarStage";
 import ChatWindow from "@/components/Chat/ChatWindow";
 import InputBar from "@/components/Chat/InputBar";
 import { useLiveVoice } from "@/components/Voice/useLiveVoice";
+import { PanelLeft, Mic, PhoneOff, Settings, Volume2, Sparkles, Send, Download, LogOut, MessageSquare } from "lucide-react";
+
 export default function Dashboard({ user, displayName, initialConversations }: { user: { id: string; email: string }; displayName: string; initialConversations: Conversation[] }) {
   const [conversations, setConversations] = useState(initialConversations);
   const [conversationId, setConversationId] = useState("");
@@ -20,6 +22,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
   const [avatarId, setAvatarId] = useState<AvatarId>("ayush");
   const [error, setError] = useState("");
   const [voiceMode, setVoiceMode] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -32,9 +35,19 @@ export default function Dashboard({ user, displayName, initialConversations }: {
 
   const conversation = useMemo(() => conversations.find(c => c.id === conversationId), [conversations, conversationId]);
 
+  // Auto-close sidebar on mobile by default
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
+  }, []);
+
   // We load the conversation only when explicitly selected, to avoid overwriting optimistic messages on creation.
   async function selectConversation(id: string) {
     setConversationId(id);
+    if (typeof window !== "undefined" && window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
     await loadConversation(id);
   }
 
@@ -290,7 +303,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
   }, [voiceMode, avatarId]);
 
   return (
-    <main className="shell" style={{ display: "grid", gridTemplateColumns: voiceMode ? "1fr" : "260px 1fr", height: "100vh", overflow: "hidden", transition: "grid-template-columns 0.3s ease", position: "relative" }}>
+    <main className="shell" style={{ display: "grid", gridTemplateColumns: voiceMode ? "1fr" : (isSidebarOpen ? "260px 1fr" : "0px 1fr"), height: "100vh", overflow: "hidden", transition: "grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1)", position: "relative" }}>
       {!voiceMode && (
         <Sidebar 
           displayName={displayName}
@@ -300,20 +313,36 @@ export default function Dashboard({ user, displayName, initialConversations }: {
           onNewConversation={newConversation} 
           avatarId={avatarId}
           setAvatarId={setAvatarId}
+          isOpen={isSidebarOpen}
+          setIsOpen={setIsSidebarOpen}
         />
       )}
       
       <section style={{ position: "relative", display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
         
         {/* Top absolute controls */}
-        <div style={{ position: "absolute", top: "24px", left: "24px", zIndex: 100, display: "flex", alignItems: "center", gap: "12px" }}>
+        <div className="dashboard-controls-left" style={{ position: "absolute", top: "24px", left: "24px", zIndex: 100, display: "flex", alignItems: "center", gap: "12px" }}>
+           {!voiceMode && (
+             <button 
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                style={{
+                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px",
+                  padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-dim)",
+                  cursor: "pointer", transition: "all 0.2s ease"
+                }}
+                className="hover:bg-white/10 hover:text-white focus-ring"
+                aria-label="Toggle Sidebar"
+             >
+               <PanelLeft size={20} />
+             </button>
+           )}
            <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(16, 185, 129, 0.1)", padding: "6px 12px", borderRadius: "12px", border: "1px solid rgba(16, 185, 129, 0.2)" }}>
               <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#10b981", boxShadow: "0 0 10px #10b981" }} />
               <span style={{ fontSize: "12px", color: "var(--text-dim)", fontWeight: 500 }}>Online</span>
            </div>
         </div>
 
-        <div style={{ position: "absolute", top: "24px", right: "24px", zIndex: 100, display: "flex", gap: "24px", alignItems: "center" }}>
+        <div className="dashboard-controls-right" style={{ position: "absolute", top: "24px", right: "24px", zIndex: 100, display: "flex", gap: "24px", alignItems: "center" }}>
           
           {voiceMode && (
             <div style={{ color: sessionState === "connected" ? "#10b981" : sessionState === "error" ? "#ef4444" : "var(--text-dim)", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "6px" }}>

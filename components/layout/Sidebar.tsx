@@ -3,7 +3,7 @@ import type { Conversation } from "@/types/chat";
 import type { AvatarId } from "@/types/avatar";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { MessageSquare, Folder, Brain, User, Settings, Plus, LogOut, Bot, UserRound, Sparkles, MessageCircle } from "lucide-react";
+import { MessageSquare, Folder, Brain, User, Settings, Plus, LogOut, Bot, UserRound, Sparkles, MessageCircle, X } from "lucide-react";
 
 export default function Sidebar({
   displayName,
@@ -12,7 +12,9 @@ export default function Sidebar({
   onSelectConversation,
   onNewConversation,
   avatarId,
-  setAvatarId
+  setAvatarId,
+  isOpen,
+  setIsOpen
 }: {
   displayName: string;
   conversations: Conversation[];
@@ -21,9 +23,27 @@ export default function Sidebar({
   onNewConversation: () => void;
   avatarId: AvatarId;
   setAvatarId: (id: AvatarId) => void;
+  isOpen?: boolean;
+  setIsOpen?: (open: boolean) => void;
 }) {
   return (
-    <aside style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden", padding: "28px 24px", zIndex: 50, borderRight: "1px solid rgba(255,255,255,0.02)", background: "var(--sidebar-bg)" }}>
+    <>
+      <div 
+        className={`sidebar-overlay ${isOpen ? 'open' : ''}`} 
+        onClick={() => setIsOpen && setIsOpen(false)} 
+      />
+      <aside className={`sidebar-container ${isOpen ? 'open' : ''}`} style={{ display: "flex", flexDirection: "column", padding: "28px 24px" }}>
+        
+        {/* Mobile Close Button (only visible loosely via flex layout) */}
+        {setIsOpen && (
+          <button 
+            className="md:hidden"
+            onClick={() => setIsOpen(false)}
+            style={{ position: "absolute", top: "16px", right: "16px", background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer", display: typeof window !== 'undefined' && window.innerWidth <= 768 ? 'block' : 'none' }}
+          >
+            <X size={24} />
+          </button>
+        )}
       
       {/* Brand Header */}
       <div style={{ marginBottom: "28px", paddingLeft: "4px" }}>
@@ -159,5 +179,6 @@ export default function Sidebar({
         <LogOut size={16} color="var(--muted)" />
       </div>
     </aside>
+    </>
   );
 }
