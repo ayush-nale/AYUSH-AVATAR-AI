@@ -303,7 +303,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
   }, [voiceMode, avatarId]);
 
   return (
-    <main className="shell" style={{ display: "grid", gridTemplateColumns: voiceMode ? "1fr" : (isSidebarOpen ? "260px 1fr" : "0px 1fr"), height: "100vh", overflow: "hidden", transition: "grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1)", position: "relative" }}>
+    <main className="shell" style={{ display: "grid", gridTemplateColumns: voiceMode ? "1fr" : (isSidebarOpen ? "260px 1fr" : "0px 1fr"), height: "100dvh", overflow: "hidden", transition: "grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1)", position: "relative" }}>
       {!voiceMode && (
         <Sidebar 
           displayName={displayName}
@@ -318,7 +318,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
         />
       )}
       
-      <section style={{ position: "relative", display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
+      <section style={{ position: "relative", display: "flex", flexDirection: "column", height: "100dvh", overflow: "hidden" }}>
         
         {/* Top absolute controls */}
         <div className="dashboard-controls-left" style={{ position: "absolute", top: "24px", left: "24px", zIndex: 100, display: "flex", alignItems: "center", gap: "12px" }}>

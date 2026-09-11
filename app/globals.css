@@ -19,7 +19,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--bg);
   background-image: 
     radial-gradient(circle at 50% 0%, rgba(157, 78, 221, 0.08) 0%, transparent 60%),
@@ -100,7 +100,7 @@ button { cursor: pointer; }
 .sidebar-container {
   width: 260px;
   flex-shrink: 0;
-  height: 100vh;
+  height: 100dvh;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   background: var(--sidebar-bg);
@@ -132,7 +132,7 @@ button { cursor: pointer; }
   .sidebar-overlay.open {
     display: block;
     position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
+    top: 0; left: 0; width: 100vw; height: 100dvh;
     background: rgba(0,0,0,0.5);
     z-index: 999;
     backdrop-filter: blur(4px);
@@ -199,10 +199,12 @@ button { cursor: pointer; }
     padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
   }
   .chat-panel-zone.has-messages {
-    height: 70% !important; /* increased slightly to account for safe area */
+    height: 55dvh !important; /* Reduced to avoid vertical clipping */
   }
   .hero-container {
-    display: none !important;
+    display: flex !important;
+    transform: scale(0.7) translateY(-5vh);
+    transform-origin: top left;
   }
   
   .dashboard-controls-right {
@@ -220,8 +222,12 @@ button { cursor: pointer; }
     font-size: 10px !important;
   }
   
+  /* Make avatar smaller and sit higher on mobile */
+  .avatar-stage-container {
+    transform: scale(0.8) translateY(-8vh) !important;
+  }
   .avatar-stage-container.voice-active {
-    transform: scale(1.0) translateY(5vh) !important;
+    transform: scale(0.9) translateY(0) !important;
   }
 
   .input-bar-container {
