@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";import {createClient} from "@/lib/supabase/server";
+export async function DELETE(_req:Request,{params}:{params:Promise<{id:string}>}){const id=(await params).id;const s=await createClient();const {data:{user},error}=await s.auth.getUser();if(error||!user)return NextResponse.json({error:"Unauthenticated"},{status:401});const {error:e}=await s.from("memories").delete().eq("id",id).eq("user_id",user.id);if(e)return NextResponse.json({error:"Could not delete memory"},{status:500});return NextResponse.json({ok:true})}

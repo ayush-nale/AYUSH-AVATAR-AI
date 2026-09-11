@@ -1,0 +1,2 @@
+import { describe,expect,it } from "vitest";import { rateLimit } from "@/lib/rate-limit";
+describe("rateLimit",()=>{it("allows up to limit",()=>{const k=`test-${Math.random()}`;expect(rateLimit(k,2,1000).allowed).toBe(true);expect(rateLimit(k,2,1000).allowed).toBe(true);expect(rateLimit(k,2,1000).allowed).toBe(false)});it("resets after window",async()=>{const k=`test-${Math.random()}`;expect(rateLimit(k,1,10).allowed).toBe(true);await new Promise(r=>setTimeout(r,15));expect(rateLimit(k,1,10).allowed).toBe(true)})});

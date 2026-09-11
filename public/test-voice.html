@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h1>Voice Test</h1>
+  <button id="btn">Connect</button>
+  <div id="log"></div>
+  <script type="module">
+    import { GoogleGenAI } from "https://esm.sh/@google/genai@0.1.1";
+    
+    document.getElementById('btn').onclick = async () => {
+      const log = document.getElementById('log');
+      const addLog = (msg) => { log.innerHTML += msg + "<br/>"; console.log(msg); };
+      
+      try {
+        addLog("Fetching token...");
+        const res = await fetch('/api/voice/token');
+        if (!res.ok) throw new Error("Failed token: " + res.status);
+        const { token } = await res.json();
+        
+        addLog("Got token. Initializing GoogleGenAI...");
+        const ai = new GoogleGenAI({ apiKey: token, httpOptions: { apiVersion: "v1alpha" } });
+        
+        addLog("Connecting to live...");
+        const session = await ai.live.connect({
+          model: "gemini-2.0-flash-exp",
+          callbacks: {
+            onmessage: () => addLog("Got message"),
+            onerror: (e) => addLog("Error: " + e),
+            onclose: () => addLog("Closed")
+          }
+        });
+        addLog("Connected!");
+      } catch (e) {
+        addLog("Exception: " + e.message);
+      }
+    };
+  </script>
+</body>
+</html>

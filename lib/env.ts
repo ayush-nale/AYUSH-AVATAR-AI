@@ -1,0 +1,41 @@
+import { z } from "zod";
+
+const envSchema = z.object({
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_MODEL: z.string().default("gemini-3.6-flash"),
+  OPENAI_API_KEY: z.string().optional(),
+  OPENAI_MODEL: z.string().default("gpt-5.6-luna"),
+  OPENAI_TTS_MODEL: z.string().default("gpt-4o-mini-tts"),
+  OPENAI_TTS_VOICE: z.string().default("coral"),
+  OPENAI_STT_MODEL: z.string().default("gpt-4o-mini-transcribe"),
+  ELEVENLABS_API_KEY: z.string().optional(),
+  ELEVENLABS_VOICE_ID: z.string().optional(),
+  ELEVENLABS_MODEL_ID: z.string().default("eleven_multilingual_v2"),
+  NEXT_PUBLIC_APP_NAME: z.string().default("AI AYUSH"),
+  NEXT_PUBLIC_AVATAR_PATH: z.string().default("/avatar/ayush.vrm"),
+  RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60000),
+  RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(20),
+  MAX_CHAT_CHARS: z.coerce.number().int().positive().default(8000),
+  MAX_AUDIO_BYTES: z.coerce.number().int().positive().default(10000000),
+  MAX_AUDIO_SECONDS: z.coerce.number().int().positive().default(90),
+});
+
+export const env = envSchema.parse({
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+  GEMINI_MODEL: process.env.GEMINI_MODEL,
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  OPENAI_MODEL: process.env.OPENAI_MODEL,
+  OPENAI_TTS_MODEL: process.env.OPENAI_TTS_MODEL,
+  OPENAI_TTS_VOICE: process.env.OPENAI_TTS_VOICE,
+  OPENAI_STT_MODEL: process.env.OPENAI_STT_MODEL,
+  ELEVENLABS_API_KEY: process.env.ELEVENLABS_API_KEY,
+  ELEVENLABS_VOICE_ID: process.env.ELEVENLABS_VOICE_ID,
+  ELEVENLABS_MODEL_ID: process.env.ELEVENLABS_MODEL_ID,
+  NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
+  NEXT_PUBLIC_AVATAR_PATH: process.env.NEXT_PUBLIC_AVATAR_PATH,
+  RATE_LIMIT_WINDOW_MS: process.env.RATE_LIMIT_WINDOW_MS,
+  RATE_LIMIT_MAX_REQUESTS: process.env.RATE_LIMIT_MAX_REQUESTS,
+  MAX_CHAT_CHARS: process.env.MAX_CHAT_CHARS,
+  MAX_AUDIO_BYTES: process.env.MAX_AUDIO_BYTES,
+  MAX_AUDIO_SECONDS: process.env.MAX_AUDIO_SECONDS,
+});
