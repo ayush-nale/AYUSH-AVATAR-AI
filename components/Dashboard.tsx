@@ -378,19 +378,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
 
         {/* 2. Chat Panel Zone (Glass overlay at bottom) */}
         {!voiceMode && (
-          <div style={{ 
-             position: "absolute", bottom: "24px", left: "24px", right: "24px", 
-             height: messages.length === 0 ? "auto" : "45%", 
-             display: "flex", flexDirection: "column", zIndex: 20,
-             background: "rgba(10, 8, 20, 0.4)",
-             backdropFilter: "blur(24px)",
-             WebkitBackdropFilter: "blur(24px)",
-             border: "1px solid rgba(168, 85, 247, 0.15)",
-             borderRadius: "24px",
-             boxShadow: "0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
-             padding: "24px",
-             transition: "all 0.3s ease"
-          }}>
+          <div className={`chat-panel-zone ${messages.length > 0 ? 'has-messages' : ''}`}>
             {/* Scrollable messages area */}
             <div style={{ flex: 1, overflowY: "auto", minHeight: 0, paddingBottom: "16px" }} className="scrollbar">
               <ChatWindow messages={messages} error={error} onSuggestionClick={sendMessage} displayName={displayName} />
