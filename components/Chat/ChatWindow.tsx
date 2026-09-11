@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { ChatMessage } from "@/types/chat";
 
 export default function ChatWindow({ messages, error, onSuggestionClick, displayName = "Ayush" }: { messages: ChatMessage[]; error: string; onSuggestionClick: (text: string) => void; displayName?: string }) {
@@ -6,6 +6,27 @@ export default function ChatWindow({ messages, error, onSuggestionClick, display
   const containerRef = useRef<HTMLDivElement>(null);
 
   const prevFirstMessageId = useRef<string | undefined>(messages[0]?.id);
+
+  const [greeting, setGreeting] = useState("Hey");
+  const [prompt, setPrompt] = useState("what are we working on today?");
+
+  useEffect(() => {
+    // Dynamic greeting based on local time
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Good Morning");
+    else if (hour < 17) setGreeting("Good Afternoon");
+    else setGreeting("Good Evening");
+
+    // Random prompt
+    const prompts = [
+      "what are we working on today?",
+      "what's your agenda today?",
+      "how can I help you right now?",
+      "ready to get things done?",
+      "what's on your mind today?"
+    ];
+    setPrompt(prompts[Math.floor(Math.random() * prompts.length)]);
+  }, []);
 
   // Scroll to bottom reliably
   useEffect(() => {
@@ -18,8 +39,8 @@ export default function ChatWindow({ messages, error, onSuggestionClick, display
     return (
       <div style={{ width: "100%", maxWidth: "800px", margin: "0 auto", padding: "0 24px", display: "flex", flexDirection: "column", justifyContent: "center", height: "100%", gap: "24px" }}>
         <div style={{ textAlign: "center" }}>
-          <h2 className="text-gradient font-heading" style={{ fontSize: "32px", margin: "0 0 12px 0" }}>Hey {displayName},</h2>
-          <p style={{ color: "var(--muted)", fontSize: "16px", margin: 0 }}>what are we working on today?</p>
+          <h2 className="text-gradient font-heading" style={{ fontSize: "32px", margin: "0 0 12px 0" }}>{greeting}, {displayName}</h2>
+          <p style={{ color: "var(--muted)", fontSize: "16px", margin: 0 }}>{prompt}</p>
         </div>
         
 

@@ -2,7 +2,7 @@ import React from "react";
 
 export default function Hero() {
   return (
-    <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", display: "flex", flexDirection: "column", zIndex: 1, pointerEvents: "none" }}>
+    <div className="hero-container" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", display: "flex", flexDirection: "column", zIndex: 1, pointerEvents: "none" }}>
       
 
       
