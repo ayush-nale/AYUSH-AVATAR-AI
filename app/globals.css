@@ -302,12 +302,14 @@ button { cursor: pointer; }
     padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
   }
   .chat-panel-zone.has-messages {
-    height: 55dvh !important;
+    max-height: 40dvh !important;
+    height: auto !important;
+  }
+  .desktop-only-greeting {
+    display: none !important;
   }
   .hero-container {
-    display: flex !important;
-    transform: scale(0.7) translateY(-5vh);
-    transform-origin: top left;
+    display: none !important;
   }
   
   .dashboard-controls-right {
@@ -327,10 +329,10 @@ button { cursor: pointer; }
   
   /* Centered and scaled correctly for mobile */
   .avatar-stage-container {
-    transform: scale(0.8) translateY(-10vh) !important;
+    transform: none !important;
   }
   .avatar-stage-container.voice-active {
-    transform: scale(0.95) translateY(0) !important;
+    transform: scale(1.05) translateY(2vh) !important;
   }
 
   .subtitles-overlay {
