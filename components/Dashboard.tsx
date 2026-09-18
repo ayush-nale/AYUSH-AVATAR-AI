@@ -23,6 +23,8 @@ export default function Dashboard({ user, displayName, initialConversations }: {
   const [error, setError] = useState("");
   const [voiceMode, setVoiceMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [userSubtitle, setUserSubtitle] = useState("");
+  const [aiSubtitle, setAiSubtitle] = useState("");
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -288,11 +290,23 @@ export default function Dashboard({ user, displayName, initialConversations }: {
     },
     (expr) => {
       setExpression(expr as Expression);
+    },
+    (userText) => {
+      setUserSubtitle(userText);
+      setAiSubtitle("");
+    },
+    (aiChunk) => {
+      setAiSubtitle(prev => prev + aiChunk);
+    },
+    () => {
+      // turn complete
     }
   );
 
   useEffect(() => {
     if (voiceMode) {
+      setUserSubtitle("");
+      setAiSubtitle("");
       disconnect();
       setAppState("listening");
       connect();
@@ -302,8 +316,10 @@ export default function Dashboard({ user, displayName, initialConversations }: {
     }
   }, [voiceMode, avatarId]);
 
+  const layoutClass = voiceMode ? "layout-voice-mode" : (isSidebarOpen ? "layout-sidebar-open" : "layout-sidebar-closed");
+
   return (
-    <main className="shell" style={{ display: "grid", gridTemplateColumns: voiceMode ? "1fr" : (isSidebarOpen ? "260px 1fr" : "0px 1fr"), height: "100dvh", overflow: "hidden", transition: "grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1)", position: "relative" }}>
+    <main className={`shell ${layoutClass}`}>
       {!voiceMode && (
         <Sidebar 
           displayName={displayName}
@@ -371,9 +387,16 @@ export default function Dashboard({ user, displayName, initialConversations }: {
         <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: "100%", zIndex: 10 }}>
           {messages.length === 0 && !voiceMode && <Hero />}
           
-          <div className={`avatar-stage-container ${voiceMode ? 'voice-active' : ''}`} style={{ position: "absolute", zIndex: 5, width: "100%", height: "100%", transform: voiceMode ? "scale(1.1) translateY(5vh)" : "none", transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)" }}>
+          <div className={`avatar-stage-container ${voiceMode ? 'voice-active' : ''}`}>
             <AvatarStage state={appState} expression={expression} lipSyncRef={lipSyncRef} avatarId={avatarId} />
           </div>
+
+          {voiceMode && (userSubtitle || aiSubtitle) && (
+            <div className="subtitles-overlay">
+               {userSubtitle && <p className="subtitle-user">"{userSubtitle}"</p>}
+               {aiSubtitle && <p className="subtitle-ai">{aiSubtitle}</p>}
+            </div>
+          )}
         </div>
 
         {/* 2. Chat Panel Zone (Glass overlay at bottom) */}

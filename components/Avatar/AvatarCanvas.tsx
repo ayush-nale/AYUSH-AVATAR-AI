@@ -1,7 +1,7 @@
 "use client";
-import React, { Suspense, MutableRefObject } from "react";
+import React, { Suspense, MutableRefObject, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Environment, OrbitControls } from "@react-three/drei";
+import { Environment, OrbitControls, PerformanceMonitor } from "@react-three/drei";
 import type { AvatarState, Expression, AvatarId } from "@/types/avatar";
 import AvatarRenderer from "./AvatarRenderer";
 
@@ -13,9 +13,12 @@ class CanvasErrorBoundary extends React.Component<{ children: React.ReactNode },
 }
 
 export default function AvatarCanvas({ state, expression, lipSyncRef, avatarId }: { state: AvatarState; expression: Expression; lipSyncRef: MutableRefObject<number>; avatarId: AvatarId }) {
+  const [dpr, setDpr] = useState<[number, number]>([1, 2]);
+
   return (
     <CanvasErrorBoundary>
-      <Canvas camera={{ position: [0, 1.35, 1.8], fov: 35 }} dpr={[1, 2]}>
+      <Canvas camera={{ position: [0, 1.35, 1.8], fov: 35 }} dpr={dpr}>
+        <PerformanceMonitor onIncline={() => setDpr([1.5, 2])} onDecline={() => setDpr([0.8, 1])} />
         <ambientLight intensity={1.5} color="#ffffff" />
         {/* Soft front key light */}
         <directionalLight position={[0, 2, 4]} intensity={2.5} color="#ffffff" />

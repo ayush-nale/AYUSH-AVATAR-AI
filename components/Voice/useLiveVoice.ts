@@ -4,7 +4,15 @@ import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_PROMPT } from "@/lib/ai";
 import type { AvatarId } from "@/types/avatar";
 
-export function useLiveVoice(avatarId: AvatarId | string, onVolumeChange: (vol: number) => void, onSpeakingChange?: (speaking: boolean) => void, onExpressionChange?: (expr: string) => void) {
+export function useLiveVoice(
+  avatarId: AvatarId | string,
+  onVolumeChange: (vol: number) => void,
+  onSpeakingChange?: (speaking: boolean) => void,
+  onExpressionChange?: (expr: string) => void,
+  onUserTranscript?: (text: string) => void,
+  onAiTranscriptChunk?: (text: string) => void,
+  onTurnComplete?: () => void
+) {
   const [sessionState, setSessionState] = useState<"idle" | "connecting" | "connected" | "error">("idle");
   const [error, setError] = useState<string>("");
   
@@ -32,8 +40,16 @@ export function useLiveVoice(avatarId: AvatarId | string, onVolumeChange: (vol: 
     setSessionState("connecting");
     setError("");
 
+    // Create and resume AudioContext immediately synchronously for mobile browsers
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    const actx = new AudioContext({ sampleRate: 16000 });
+    if (actx.state === "suspended") {
+      actx.resume().catch(console.error);
+    }
+    audioContextRef.current = actx;
+
     try {
-      // 3. Get Auth Token
+      // 1. Get Auth Token
       console.log("Fetching token...");
       const res = await fetch("/api/voice/token");
       const data = await res.json();
@@ -53,10 +69,6 @@ export function useLiveVoice(avatarId: AvatarId | string, onVolumeChange: (vol: 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1 } });
       mediaStreamRef.current = stream;
 
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      const actx = new AudioContext({ sampleRate: 16000 });
-      audioContextRef.current = actx;
-      
       const analyser = actx.createAnalyser();
       analyser.fftSize = 256;
       analyser.connect(actx.destination);
@@ -77,6 +89,7 @@ export function useLiveVoice(avatarId: AvatarId | string, onVolumeChange: (vol: 
                 const sc = data.serverContent;
                 if (sc && sc.outputTranscription && sc.outputTranscription.text) {
                    const text = sc.outputTranscription.text;
+                   if (onUserTranscript) onUserTranscript(text);
                    if (text.includes("😊") || text.includes("😄") || text.includes("😁")) onExpressionChange?.("happy");
                    else if (text.includes("😢") || text.includes("😔") || text.includes("😭")) onExpressionChange?.("sad");
                    else if (text.includes("😡") || text.includes("😠") || text.includes("🤬")) onExpressionChange?.("angry");
@@ -97,11 +110,13 @@ export function useLiveVoice(avatarId: AvatarId | string, onVolumeChange: (vol: 
                 if (sc.turnComplete) {
                    textBufferRef.current = "";
                    expressionParsedRef.current = false;
+                   if (onTurnComplete) onTurnComplete();
                 }
                 
                 if (sc.modelTurn && sc.modelTurn.parts) {
                    for (const part of sc.modelTurn.parts) {
                       if (part.text) {
+                         if (onAiTranscriptChunk) onAiTranscriptChunk(part.text);
                          if (!expressionParsedRef.current) {
                             textBufferRef.current += part.text;
                             const match = textBufferRef.current.match(/\[(.*?)\]/);
