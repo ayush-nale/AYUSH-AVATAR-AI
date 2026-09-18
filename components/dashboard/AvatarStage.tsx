@@ -43,9 +43,9 @@ export default function AvatarStage({
           </div>
         </div>
         
-        {/* Status Bubble - moved down slightly to not be exactly at top */}
+        {/* Status Bubble - moved to bottom 20% so it's below his face but above the UI */}
         {status && (
-          <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", animation: "float 4s ease-in-out infinite", zIndex: 10, pointerEvents: "none" }}>
+          <div style={{ position: "absolute", bottom: "20%", left: "50%", transform: "translateX(-50%)", animation: "float 4s ease-in-out infinite", zIndex: 10, pointerEvents: "none" }}>
             <div className="glass-panel" style={{ 
               padding: "12px 16px", 
               borderRadius: "24px", 
