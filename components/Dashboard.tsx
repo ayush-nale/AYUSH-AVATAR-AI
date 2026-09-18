@@ -295,9 +295,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
       lipSyncRef.current = Math.min(1, vol * 3);
     },
     (speaking) => {
-      if (voiceMode) {
-        setAppState(speaking ? "speaking" : "listening");
-      }
+      setAppState(speaking ? "speaking" : "listening");
     },
     (expr) => {
       setExpression(expr as Expression);
