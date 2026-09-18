@@ -293,8 +293,8 @@ export default function Dashboard({ user, displayName, initialConversations }: {
     (userText) => {
       setUserSubtitle(userText);
     },
-    (aiChunk) => {
-      setAiSubtitle(prev => prev + aiChunk);
+    (fullText) => {
+      setAiSubtitle(fullText);
     },
     () => {
       // turn complete
@@ -392,7 +392,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
         <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: "100%", zIndex: 10 }}>
           
           <div className={`avatar-stage-container ${voiceMode ? 'voice-active' : ''}`}>
-            <AvatarStage state={appState} expression={expression} lipSyncRef={lipSyncRef} avatarId={avatarId} />
+            <AvatarStage state={voiceMode ? appState : "idle"} expression={expression} lipSyncRef={lipSyncRef} avatarId={avatarId} />
           </div>
 
           {voiceMode && (userSubtitle || aiSubtitle) && (

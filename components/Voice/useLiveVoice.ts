@@ -116,7 +116,6 @@ export function useLiveVoice(
                 if (sc.modelTurn && sc.modelTurn.parts) {
                    for (const part of sc.modelTurn.parts) {
                       if (part.text) {
-                         if (onAiTranscriptChunk) onAiTranscriptChunk(part.text);
                          if (!expressionParsedRef.current) {
                             textBufferRef.current += part.text;
                             const match = textBufferRef.current.match(/\[(.*?)\]/);
@@ -124,10 +123,12 @@ export function useLiveVoice(
                                onExpressionChange(match[1].toLowerCase());
                                expressionParsedRef.current = true;
                             } else if (textBufferRef.current.length > 100) {
-                               // Give up parsing after 100 characters to avoid infinite buffering
                                expressionParsedRef.current = true;
                             }
+                         } else {
+                            textBufferRef.current += part.text;
                          }
+                         if (onAiTranscriptChunk) onAiTranscriptChunk(textBufferRef.current);
                       }
                       if (part.inlineData && part.inlineData.data) {
                          const base64 = part.inlineData.data;
@@ -286,20 +287,26 @@ export function useLiveVoice(
       };
 
       source.connect(scriptNode);
-      scriptNode.connect(actx.destination); // Required to make onaudioprocess fire
+      
+      // CRITICAL: Connect to a muted gain node before destination to prevent microphone echo
+      const zeroGain = actx.createGain();
+      zeroGain.gain.value = 0;
+      scriptNode.connect(zeroGain);
+      zeroGain.connect(actx.destination);
 
       const dataArray = new Uint8Array(analyser.frequencyBinCount);
       const loop = () => {
         if (analyserRef.current) {
           analyserRef.current.getByteTimeDomainData(dataArray);
-          let sum = 0;
+          let maxVal = 0;
           for (let i = 0; i < dataArray.length; i++) {
-            const val = dataArray[i] - 128;
-            sum += val * val;
+            const val = Math.abs(dataArray[i] - 128);
+            if (val > maxVal) maxVal = val;
           }
-          const rms = Math.sqrt(sum / dataArray.length);
-          const normalized = Math.min(1, rms / 60);
-          onVolumeChange(Math.pow(normalized, 2));
+          // Max possible value is 128. Speech usually peaks around 30-50.
+          // Scale it so that normal talking causes noticeable mouth opening.
+          const normalized = Math.min(1, maxVal / 40);
+          onVolumeChange(normalized);
         }
         rafRef.current = requestAnimationFrame(loop);
       };
