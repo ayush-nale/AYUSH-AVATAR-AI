@@ -16,6 +16,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showVerifiedToast, setShowVerifiedToast] = useState(false);
   const [appState, setAppState] = useState<AvatarState>("idle");
   const [expression, setExpression] = useState<Expression>("neutral");
   const [avatarId, setAvatarId] = useState<AvatarId>("ayush");
@@ -35,6 +36,17 @@ export default function Dashboard({ user, displayName, initialConversations }: {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const conversation = useMemo(() => conversations.find(c => c.id === conversationId), [conversations, conversationId]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("verified") === "true") {
+        setShowVerifiedToast(true);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setTimeout(() => setShowVerifiedToast(false), 5000);
+      }
+    }
+  }, []);
 
   // Auto-close sidebar on mobile by default
   useEffect(() => {
@@ -350,6 +362,26 @@ export default function Dashboard({ user, displayName, initialConversations }: {
               <span style={{ fontSize: "12px", color: "var(--text-dim)", fontWeight: 500 }}>Online</span>
            </div>
         </div>
+
+        {/* Verified Toast */}
+        {showVerifiedToast && (
+          <div style={{
+            position: "fixed",
+            top: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "linear-gradient(90deg, rgba(168, 85, 247, 0.9), rgba(126, 34, 206, 0.9))",
+            color: "white",
+            padding: "12px 24px",
+            borderRadius: "24px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+            zIndex: 9999,
+            fontWeight: 500,
+            animation: "fadeInDown 0.5s ease-out"
+          }}>
+            ✨ Email verified! Logged in successfully.
+          </div>
+        )}
 
         <div className="dashboard-controls-right" style={{ position: "absolute", top: "24px", right: "24px", zIndex: 100, display: "flex", gap: "24px", alignItems: "center" }}>
           
