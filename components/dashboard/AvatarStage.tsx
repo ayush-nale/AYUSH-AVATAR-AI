@@ -43,34 +43,34 @@ export default function AvatarStage({
           </div>
         </div>
         
-        {/* Status Bubble - safely to the side/bottom to never overlap the face */}
+        {/* Status Bubble - properly centered so it doesn't get clipped on mobile */}
         {status && (
-          <div style={{ position: "absolute", bottom: "15%", right: "-10%", animation: "float 4s ease-in-out infinite", zIndex: 10, pointerEvents: "none" }}>
+          <div style={{ position: "absolute", bottom: "5%", left: "50%", transform: "translateX(-50%)", animation: "float 4s ease-in-out infinite", zIndex: 10, pointerEvents: "none" }}>
             <div className="glass-panel" style={{ 
-              padding: "16px 20px", 
+              padding: "12px 16px", 
               borderRadius: "24px", 
-              borderBottomLeftRadius: "4px", 
-              fontSize: "15px", 
+              fontSize: "14px", 
               color: "var(--text)", 
               border: "1px solid rgba(157, 78, 221, 0.3)", 
               boxShadow: "0 8px 32px rgba(157, 78, 221, 0.15)", 
               display: "flex", 
               alignItems: "center", 
-              gap: "12px",
+              gap: "10px",
               background: "linear-gradient(90deg, rgba(15, 12, 29, 0.8), rgba(20, 15, 40, 0.9))",
+              whiteSpace: "nowrap"
             }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "28px", height: "28px", borderRadius: "50%", background: "rgba(157, 78, 221, 0.2)" }}>
-                {state === "listening" && <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "var(--accent)", animation: "pulse 1.5s infinite" }} />}
-                {state === "thinking" && <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "var(--accent2)", animation: "pulse 1s infinite" }} />}
-                {state === "error" && <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "var(--danger)" }} />}
-                {state === "speaking" && <span style={{ fontSize: "12px" }}>💬</span>}
-                {state === "idle" && <span style={{ fontSize: "12px" }}>✨</span>}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "24px", height: "24px", borderRadius: "50%", background: "rgba(157, 78, 221, 0.2)" }}>
+                {state === "listening" && <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "var(--accent)", animation: "pulse 1.5s infinite" }} />}
+                {state === "thinking" && <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "var(--accent2)", animation: "pulse 1s infinite" }} />}
+                {state === "error" && <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "var(--danger)" }} />}
+                {state === "speaking" && <span style={{ fontSize: "10px" }}>💬</span>}
+                {state === "idle" && <span style={{ fontSize: "10px" }}>✨</span>}
               </div>
               <span style={{ fontWeight: 500 }}>{status}</span>
               
-              <div style={{ marginLeft: "12px", fontSize: "10px", color: "var(--accent)", textTransform: "uppercase", letterSpacing: "1px", borderLeft: "1px solid rgba(255,255,255,0.1)", paddingLeft: "12px", display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
+              <div style={{ marginLeft: "8px", fontSize: "9px", color: "var(--accent)", textTransform: "uppercase", letterSpacing: "1px", borderLeft: "1px solid rgba(255,255,255,0.1)", paddingLeft: "10px", display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
                 <span>AI</span>
-                <span>{avatarId.toUpperCase()}</span>
+                <span>{avatarId}</span>
               </div>
             </div>
           </div>

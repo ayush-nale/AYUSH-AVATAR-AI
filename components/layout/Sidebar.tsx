@@ -74,16 +74,16 @@ export default function Sidebar({
       {/* Navigation & Conversations */}
       <nav style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1, overflowY: "auto" }} className="scrollbar">
         
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "14px", textDecoration: "none", color: "var(--text)", padding: "12px 16px", fontSize: "14px", borderRadius: "10px", background: "rgba(255,255,255,0.06)", fontWeight: 500 }}>
+        <Link href="/" onClick={() => setIsOpen && setIsOpen(false)} style={{ display: "flex", alignItems: "center", gap: "14px", textDecoration: "none", color: "var(--text)", padding: "12px 16px", fontSize: "14px", borderRadius: "10px", background: "rgba(255,255,255,0.06)", fontWeight: 500 }}>
           <MessageSquare size={18} opacity={0.8} /> Chat
         </Link>
-        <Link href="/memory" style={{ display: "flex", alignItems: "center", gap: "14px", textDecoration: "none", color: "var(--text-dim)", padding: "12px 16px", fontSize: "14px", borderRadius: "10px", fontWeight: 500 }}>
+        <Link href="/memory" onClick={() => setIsOpen && setIsOpen(false)} style={{ display: "flex", alignItems: "center", gap: "14px", textDecoration: "none", color: "var(--text-dim)", padding: "12px 16px", fontSize: "14px", borderRadius: "10px", fontWeight: 500 }}>
           <Brain size={18} opacity={0.6} /> Memory
         </Link>
-        <Link href="/profile" style={{ display: "flex", alignItems: "center", gap: "14px", textDecoration: "none", color: "var(--text-dim)", padding: "12px 16px", fontSize: "14px", borderRadius: "10px", fontWeight: 500 }}>
+        <Link href="/profile" onClick={() => setIsOpen && setIsOpen(false)} style={{ display: "flex", alignItems: "center", gap: "14px", textDecoration: "none", color: "var(--text-dim)", padding: "12px 16px", fontSize: "14px", borderRadius: "10px", fontWeight: 500 }}>
           <User size={18} opacity={0.6} /> Profile
         </Link>
-        <Link href="/settings" style={{ display: "flex", alignItems: "center", gap: "14px", textDecoration: "none", color: "var(--text-dim)", padding: "12px 16px", fontSize: "14px", borderRadius: "10px", fontWeight: 500 }}>
+        <Link href="/settings" onClick={() => setIsOpen && setIsOpen(false)} style={{ display: "flex", alignItems: "center", gap: "14px", textDecoration: "none", color: "var(--text-dim)", padding: "12px 16px", fontSize: "14px", borderRadius: "10px", fontWeight: 500 }}>
           <Settings size={18} opacity={0.6} /> Settings
         </Link>
 
@@ -108,7 +108,7 @@ export default function Sidebar({
                 {conversations.map(c => (
                   <button 
                     key={c.id} 
-                    onClick={() => onSelectConversation(c.id)}
+                    onClick={() => { onSelectConversation(c.id); setIsOpen && setIsOpen(false); }}
                     className="focus-ring"
                     style={{ 
                       width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: "12px", 

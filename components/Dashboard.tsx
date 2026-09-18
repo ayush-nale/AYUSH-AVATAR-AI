@@ -4,7 +4,6 @@ import type { Conversation, ChatMessage } from "@/types/chat";
 import type { AvatarState, Expression, AvatarId } from "@/types/avatar";
 import { createClient } from "@/lib/supabase/client";
 import Sidebar from "@/components/layout/Sidebar";
-import Hero from "@/components/dashboard/Hero";
 import AvatarStage from "@/components/dashboard/AvatarStage";
 import ChatWindow from "@/components/Chat/ChatWindow";
 import InputBar from "@/components/Chat/InputBar";
@@ -293,24 +292,18 @@ export default function Dashboard({ user, displayName, initialConversations }: {
     },
     (userText) => {
       setUserSubtitle(userText);
-      setAiSubtitle("");
     },
     (aiChunk) => {
       setAiSubtitle(prev => prev + aiChunk);
     },
     () => {
       // turn complete
+      setAiSubtitle("");
     }
   );
 
   useEffect(() => {
-    if (voiceMode) {
-      setUserSubtitle("");
-      setAiSubtitle("");
-      disconnect();
-      setAppState("listening");
-      connect();
-    } else {
+    if (!voiceMode && sessionState === "connected") {
       setAppState("idle");
       disconnect();
     }
@@ -368,7 +361,19 @@ export default function Dashboard({ user, displayName, initialConversations }: {
           )}
           <button 
             className="focus-ring glass-panel glow-border" 
-            onClick={() => setVoiceMode(!voiceMode)}
+            onClick={() => {
+              if (!voiceMode) {
+                setUserSubtitle("");
+                setAiSubtitle("");
+                setAppState("listening");
+                connect();
+                setVoiceMode(true);
+              } else {
+                setAppState("idle");
+                disconnect();
+                setVoiceMode(false);
+              }
+            }}
             style={{ 
                padding: "10px 20px", borderRadius: "24px", 
                border: "1px solid rgba(168, 85, 247, 0.4)", 
@@ -385,7 +390,6 @@ export default function Dashboard({ user, displayName, initialConversations }: {
 
         {/* 1. Avatar Stage Zone (Full Background) */}
         <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: "100%", zIndex: 10 }}>
-          {messages.length === 0 && !voiceMode && <Hero />}
           
           <div className={`avatar-stage-container ${voiceMode ? 'voice-active' : ''}`}>
             <AvatarStage state={appState} expression={expression} lipSyncRef={lipSyncRef} avatarId={avatarId} />

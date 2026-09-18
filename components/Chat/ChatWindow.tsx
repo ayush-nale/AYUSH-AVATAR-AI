@@ -37,13 +37,11 @@ export default function ChatWindow({ messages, error, onSuggestionClick, display
 
   if (messages.length === 0 && !error) {
     return (
-      <div style={{ width: "100%", maxWidth: "800px", margin: "0 auto", padding: "0 24px", display: "flex", flexDirection: "column", justifyContent: "center", height: "100%", gap: "24px" }}>
+      <div style={{ width: "100%", maxWidth: "800px", margin: "0 auto", padding: "16px 24px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
         <div style={{ textAlign: "center" }}>
-          <h2 className="text-gradient font-heading" style={{ fontSize: "32px", margin: "0 0 12px 0" }}>{greeting}, {displayName}</h2>
-          <p style={{ color: "var(--muted)", fontSize: "16px", margin: 0 }}>{prompt}</p>
+          <h2 className="text-gradient font-heading" style={{ fontSize: "28px", margin: "0 0 8px 0" }}>{greeting}, {displayName}</h2>
+          <p style={{ color: "var(--muted)", fontSize: "15px", margin: 0 }}>{prompt}</p>
         </div>
-        
-
       </div>
     );
   }
