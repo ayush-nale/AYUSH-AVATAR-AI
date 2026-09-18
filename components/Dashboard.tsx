@@ -183,14 +183,13 @@ export default function Dashboard({ user, displayName, initialConversations }: {
            const loop = () => {
              if (analyserRef.current) {
                analyserRef.current.getByteTimeDomainData(dataArray);
-               let sum = 0;
+               let maxVal = 0;
                for (let i = 0; i < dataArray.length; i++) {
-                 const val = dataArray[i] - 128;
-                 sum += val * val;
+                 const val = Math.abs(dataArray[i] - 128);
+                 if (val > maxVal) maxVal = val;
                }
-               const rms = Math.sqrt(sum / dataArray.length);
-               const normalized = Math.min(1, rms / 60);
-               lipSyncRef.current = Math.pow(normalized, 2);
+               const normalized = Math.min(1, maxVal / 40);
+               lipSyncRef.current = normalized;
              }
              rafId = requestAnimationFrame(loop);
            };
@@ -295,7 +294,8 @@ export default function Dashboard({ user, displayName, initialConversations }: {
       lipSyncRef.current = Math.min(1, vol * 3);
     },
     (speaking) => {
-      setAppState(speaking ? "speaking" : "listening");
+      // Prevents disconnect() from forcing "listening" state when we just set it to "idle"
+      setAppState(prev => (prev === "idle" && !speaking) ? "idle" : (speaking ? "speaking" : "listening"));
     },
     (expr) => {
       setExpression(expr as Expression);
@@ -422,7 +422,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
         <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: "100%", zIndex: 10 }}>
           
           <div className={`avatar-stage-container ${voiceMode ? 'voice-active' : ''}`}>
-            <AvatarStage state={voiceMode ? appState : "idle"} expression={expression} lipSyncRef={lipSyncRef} avatarId={avatarId} />
+            <AvatarStage state={appState} expression={expression} lipSyncRef={lipSyncRef} avatarId={avatarId} />
           </div>
 
           {voiceMode && (userSubtitle || aiSubtitle) && (

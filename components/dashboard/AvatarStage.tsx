@@ -43,9 +43,9 @@ export default function AvatarStage({
           </div>
         </div>
         
-        {/* Status Bubble - moved to the top so it doesn't get clipped on mobile */}
+        {/* Status Bubble - moved down slightly to not be exactly at top */}
         {status && (
-          <div style={{ position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", animation: "float 4s ease-in-out infinite", zIndex: 10, pointerEvents: "none" }}>
+          <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", animation: "float 4s ease-in-out infinite", zIndex: 10, pointerEvents: "none" }}>
             <div className="glass-panel" style={{ 
               padding: "12px 16px", 
               borderRadius: "24px", 
