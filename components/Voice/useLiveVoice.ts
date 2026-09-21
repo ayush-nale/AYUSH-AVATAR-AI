@@ -55,7 +55,8 @@ export function useLiveVoice(
       const data = await res.json();
       if (!data.token) {
         console.error("No token received");
-        window.alert(`Token fetch failed: ${data.error || "Unknown error"}`);
+        setError(`Token fetch failed: ${data.error || "Unknown error"}`);
+        setSessionState("error");
         disconnect();
         return;
       }
@@ -152,7 +153,8 @@ export function useLiveVoice(
                              });
                            } catch (e: any) { 
                              console.error("Tool response error:", e);
-                             window.alert("Tool response error (1): " + e.message);
+                             setError("Tool response error: " + e.message);
+                             setSessionState("error");
                            }
                         }
                       }
@@ -214,7 +216,8 @@ export function useLiveVoice(
           },
           onerror: (e: any) => {
              console.error("Live API Error received:", e);
-             window.alert("Live API Error: " + (e.message || JSON.stringify(e)));
+             setError("Live API Error: " + (e.message || JSON.stringify(e)));
+             setSessionState("error");
           }
         },
         config: {

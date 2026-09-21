@@ -127,7 +127,12 @@ export default function Dashboard({ user, displayName, initialConversations }: {
       });
       
       if (!r.ok || !r.body) {
-        throw new Error("Chat failed to start stream");
+        let errMessage = "Chat failed to start stream";
+        try {
+          const errData = await r.json();
+          if (errData.error) errMessage = errData.error;
+        } catch(e) {}
+        throw new Error(errMessage);
       }
 
       const reader = r.body.getReader();
@@ -428,6 +433,25 @@ export default function Dashboard({ user, displayName, initialConversations }: {
             {voiceMode ? "Exit Voice" : "Voice Mode"}
           </button>
         </div>
+
+        {voiceError && voiceMode && (
+          <div style={{
+            position: "fixed",
+            top: "80px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "rgba(239, 68, 68, 0.9)",
+            color: "white",
+            padding: "12px 24px",
+            borderRadius: "24px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+            zIndex: 9999,
+            fontWeight: 500,
+            animation: "fadeInDown 0.3s ease-out"
+          }}>
+            ⚠️ {voiceError}
+          </div>
+        )}
 
         {/* 1. Avatar Stage Zone (Full Background) */}
         <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: "100%", zIndex: 10 }}>
