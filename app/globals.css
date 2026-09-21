@@ -308,9 +308,6 @@ button { cursor: pointer; }
   .input-bar-container {
     padding: 0 4px !important;
   }
-  .desktop-only-greeting {
-    display: none !important;
-  }
   .hero-container {
     display: none !important;
   }

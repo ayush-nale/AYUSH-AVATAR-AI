@@ -31,6 +31,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const lipSyncRef = useRef<number>(0);
+  const abortTTSRef = useRef<boolean>(false);
   
   // Create a ref for the input to focus it when new chat is created
   const inputRef = useRef<HTMLInputElement>(null);
@@ -137,8 +138,13 @@ export default function Dashboard({ user, displayName, initialConversations }: {
       const ttsQueue: string[] = [];
       let isPlayingTTS = false;
       let isStreamDone = false;
+      abortTTSRef.current = false;
       
       const playNextInQueue = async () => {
+         if (abortTTSRef.current) {
+            ttsQueue.length = 0;
+            return;
+         }
          if (isPlayingTTS || ttsQueue.length === 0) return;
          isPlayingTTS = true;
          const textToSpeak = ttsQueue.shift();
@@ -393,6 +399,11 @@ export default function Dashboard({ user, displayName, initialConversations }: {
             className="focus-ring glass-panel glow-border" 
             onClick={() => {
               if (!voiceMode) {
+                abortTTSRef.current = true;
+                if (audioRef.current) {
+                  audioRef.current.pause();
+                  audioRef.current.currentTime = 0;
+                }
                 setUserSubtitle("");
                 setAiSubtitle("");
                 setAppState("listening");
