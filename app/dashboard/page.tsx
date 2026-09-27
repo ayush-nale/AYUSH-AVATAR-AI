@@ -21,6 +21,7 @@ export default async function DashboardPage() {
             .limit(50),
     ]);
 
+    return (
         <Dashboard
             user={{
                 id: user.id,
