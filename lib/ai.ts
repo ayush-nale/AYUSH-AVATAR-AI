@@ -32,7 +32,7 @@ export class GeminiAPIError extends Error {
   }
 }
 
-export async function* generateReplyStream(input: { message: string; recentMessages: Array<{ role: "user" | "assistant" | "system"; content: string }>; memories: string[]; }) {
+export async function* generateReplyStream(input: { message: string; recentMessages: Array<{ role: "user" | "assistant" | "system"; content: string }>; memories: string[]; adminInstructions?: string; }) {
   const genAI = getClient();
   
   if (process.env.NODE_ENV === "development") {
@@ -73,7 +73,7 @@ export async function* generateReplyStream(input: { message: string; recentMessa
     const chat = genAI.chats.create({
       model: env.GEMINI_MODEL,
       config: {
-        systemInstruction: SYSTEM_PROMPT + "\n\n" + memoryBlock,
+        systemInstruction: SYSTEM_PROMPT + "\n\n" + (input.adminInstructions ? `ADMIN INSTRUCTIONS FOR THIS USER: ${input.adminInstructions}\n\n` : "") + memoryBlock,
       },
       history: validHistory,
     });

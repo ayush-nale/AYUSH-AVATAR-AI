@@ -10,7 +10,7 @@ import InputBar from "@/components/Chat/InputBar";
 import { useLiveVoice } from "@/components/Voice/useLiveVoice";
 import { PanelLeft, Mic, PhoneOff, Settings, Volume2, Sparkles, Send, Download, LogOut, MessageSquare } from "lucide-react";
 
-export default function Dashboard({ user, displayName, initialConversations }: { user: { id: string; email: string }; displayName: string; initialConversations: Conversation[] }) {
+export default function Dashboard({ user, displayName, isAdmin, initialConversations }: { user: { id: string; email: string }; displayName: string; isAdmin?: boolean; initialConversations: Conversation[] }) {
   const [conversations, setConversations] = useState(initialConversations);
   const [conversationId, setConversationId] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -345,6 +345,7 @@ export default function Dashboard({ user, displayName, initialConversations }: {
           setAvatarId={setAvatarId}
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
+          isAdmin={isAdmin}
         />
       )}
       

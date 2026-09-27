@@ -34,9 +34,16 @@ export async function POST(req: Request) {
     const { data: recent } = await supabase.from("messages").select("role,content").eq("conversation_id", conversationId).eq("user_id", user.id).order("created_at", { ascending: false }).limit(16);
     const memories = await getRelevantMemories(user.id, message);
     
+    const { data: profile } = await supabase.from("profiles").select("admin_instructions").eq("id", user.id).maybeSingle();
+    
     let resultStream;
     try {
-      resultStream = generateReplyStream({ message, recentMessages: (recent ?? []).reverse().map(m => ({ role: m.role as "user" | "assistant" | "system", content: m.content })), memories });
+      resultStream = generateReplyStream({ 
+        message, 
+        recentMessages: (recent ?? []).reverse().map(m => ({ role: m.role as "user" | "assistant" | "system", content: m.content })), 
+        memories,
+        adminInstructions: profile?.admin_instructions || undefined
+      });
     } catch (genErr: any) {
       console.error("AI Generation failed:", genErr);
       const status = genErr?.status || 500;

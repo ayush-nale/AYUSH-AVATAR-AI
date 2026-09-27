@@ -61,6 +61,7 @@ export function useLiveVoice(
         return;
       }
       const token = data.token;
+      const adminInstructions = data.adminInstructions || "";
 
       // 2. Initialize Gemini Live API
       const ai = new GoogleGenAI({ apiKey: token, httpOptions: { apiVersion: "v1alpha" } });
@@ -223,7 +224,7 @@ export function useLiveVoice(
         config: {
           systemInstruction: {
             parts: [{
-              text: SYSTEM_PROMPT + "\n\nCRITICAL VOICE INSTRUCTIONS: You MUST call the `set_expression` tool to change your facial expression before you speak! Make sure to pass a valid emotion from the enum."
+              text: SYSTEM_PROMPT + "\n\n" + (adminInstructions ? `ADMIN INSTRUCTIONS FOR THIS USER: ${adminInstructions}\n\n` : "") + "CRITICAL VOICE INSTRUCTIONS: You MUST call the `set_expression` tool to change your facial expression before you speak! Make sure to pass a valid emotion from the enum."
             }]
           } as any,
           responseModalities: ["AUDIO"] as any,

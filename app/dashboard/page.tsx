@@ -21,13 +21,13 @@ export default async function DashboardPage() {
             .limit(50),
     ]);
 
-    return (
         <Dashboard
             user={{
                 id: user.id,
                 email: user.email ?? "",
             }}
             displayName={profile?.display_name ?? "Ayush"}
+            isAdmin={user.email === "ayushnale@gmail.com"}
             initialConversations={conversations ?? []}
         />
     );

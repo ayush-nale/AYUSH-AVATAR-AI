@@ -20,8 +20,14 @@ export async function GET(req: Request) {
 
     // Create ephemeral auth token
     const token = await ai.authTokens.create({} as any);
+    
+    // Fetch user profile to get admin instructions
+    const { data: profile } = await supabase.from("profiles").select("admin_instructions").eq("id", user.id).maybeSingle();
 
-    return NextResponse.json({ token: token.name });
+    return NextResponse.json({ 
+      token: token.name,
+      adminInstructions: profile?.admin_instructions || ""
+    });
   } catch (globalErr: any) {
     console.error("Live Voice Token Generation Error:", globalErr);
     return NextResponse.json({ error: globalErr?.message || "Failed to generate session token." }, { status: 500 });

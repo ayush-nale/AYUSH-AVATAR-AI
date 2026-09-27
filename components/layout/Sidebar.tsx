@@ -25,6 +25,7 @@ export default function Sidebar({
   setAvatarId: (id: AvatarId) => void;
   isOpen?: boolean;
   setIsOpen?: (open: boolean) => void;
+  isAdmin?: boolean;
 }) {
   return (
     <>
@@ -86,6 +87,11 @@ export default function Sidebar({
         <Link href="/settings" onClick={() => setIsOpen && setIsOpen(false)} style={{ display: "flex", alignItems: "center", gap: "14px", textDecoration: "none", color: "var(--text-dim)", padding: "12px 16px", fontSize: "14px", borderRadius: "10px", fontWeight: 500 }}>
           <Settings size={18} opacity={0.6} /> Settings
         </Link>
+        {isAdmin && (
+          <Link href="/admin" onClick={() => setIsOpen && setIsOpen(false)} style={{ display: "flex", alignItems: "center", gap: "14px", textDecoration: "none", color: "var(--accent)", padding: "12px 16px", fontSize: "14px", borderRadius: "10px", fontWeight: 700, background: "rgba(168, 85, 247, 0.1)", border: "1px solid rgba(168, 85, 247, 0.2)", marginTop: "8px" }}>
+            <Sparkles size={18} opacity={0.8} /> Admin Platform
+          </Link>
+        )}
 
         {/* Conversations Panel */}
         {conversations.length > 0 && (
