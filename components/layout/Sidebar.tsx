@@ -14,7 +14,8 @@ export default function Sidebar({
   avatarId,
   setAvatarId,
   isOpen,
-  setIsOpen
+  setIsOpen,
+  isAdmin
 }: {
   displayName: string;
   conversations: Conversation[];
