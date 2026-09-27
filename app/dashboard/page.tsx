@@ -28,7 +28,7 @@ export default async function DashboardPage() {
                 email: user.email ?? "",
             }}
             displayName={profile?.display_name ?? "Ayush"}
-            isAdmin={user.email === "ayushnale@gmail.com"}
+            isAdmin={user.email?.trim().toLowerCase() === "ayushnale@gmail.com"}
             initialConversations={conversations ?? []}
         />
     );
