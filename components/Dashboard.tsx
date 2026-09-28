@@ -523,7 +523,7 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
                    <>
                      {aiSubtitle && <p className="subtitle-ai">{aiSubtitle}</p>}
                      {voicePdfContent && (
-                        <div style={{ marginTop: "16px", display: "flex", justifyContent: "center" }}>
+                        <div style={{ marginTop: "16px", display: "flex", justifyContent: "center", pointerEvents: "auto" }}>
                           <button 
                             onClick={() => handleDownloadPdf(voicePdfContent)}
                             className="focus-ring glass-panel glow-border"

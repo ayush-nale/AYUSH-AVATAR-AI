@@ -1,5 +1,7 @@
 export const handleDownloadPdf = async (pdfContent: string) => {
   try {
+    alert("Starting PDF download... Please wait.");
+    
     // @ts-ignore
     const html2pdf = (await import('html2pdf.js')).default;
     const element = document.createElement('div');
@@ -23,7 +25,13 @@ export const handleDownloadPdf = async (pdfContent: string) => {
     };
     
     html2pdf().set(opt).from(element).save();
-  } catch (err) {
+    
+    // Give it a small delay so we know it finished processing
+    setTimeout(() => {
+      console.log("PDF generation triggered.");
+    }, 1000);
+  } catch (err: any) {
     console.error("Failed to generate PDF:", err);
+    alert("Failed to generate PDF: " + err.message);
   }
 };
