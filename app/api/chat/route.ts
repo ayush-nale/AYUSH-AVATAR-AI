@@ -6,7 +6,17 @@ import { getRelevantMemories } from "@/lib/memory";
 import { rateLimit } from "@/lib/rate-limit";
 import { env } from "@/lib/env";
 
-const schema=z.object({conversationId:z.string().uuid(),message:z.string().trim().min(1).max(env.MAX_CHAT_CHARS)});
+const schema=z.object({
+  conversationId:z.string().uuid(),
+  message:z.string().trim().max(env.MAX_CHAT_CHARS),
+  attachment: z.object({
+    name: z.string(),
+    type: z.string(),
+    data: z.string()
+  }).optional()
+}).refine(data => data.message.length > 0 || !!data.attachment, {
+  message: "Either message or attachment must be provided"
+});
 
 export async function POST(req: Request) {
   try {
@@ -26,7 +36,7 @@ export async function POST(req: Request) {
     
     const parsed = schema.safeParse(body);
     if (!parsed.success) return NextResponse.json({ error: "Invalid chat request" }, { status: 400 });
-    const { conversationId, message } = parsed.data;
+    const { conversationId, message, attachment } = parsed.data;
     
     const { data: conversation, error: e } = await supabase.from("conversations").select("id,user_id").eq("id", conversationId).eq("user_id", user.id).maybeSingle();
     if (e || !conversation) return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
@@ -42,7 +52,8 @@ export async function POST(req: Request) {
         message, 
         recentMessages: (recent ?? []).reverse().map(m => ({ role: m.role as "user" | "assistant" | "system", content: m.content })), 
         memories,
-        adminInstructions: profile?.admin_instructions || undefined
+        adminInstructions: profile?.admin_instructions || undefined,
+        attachment
       });
     } catch (genErr: any) {
       console.error("AI Generation failed:", genErr);
@@ -118,7 +129,7 @@ export async function POST(req: Request) {
           }
           
           const { error: insertErr } = await supabase.from("messages").insert([
-             { conversation_id: conversationId, user_id: user.id, role: "user", content: message }, 
+             { conversation_id: conversationId, user_id: user.id, role: "user", content: message || `[Uploaded File: ${attachment?.name}]` }, 
              { conversation_id: conversationId, user_id: user.id, role: "assistant", content: fullReply }
           ]);
           if (!insertErr) {

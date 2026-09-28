@@ -6,6 +6,11 @@ export type ChatMessage = {
   user_id: string;
   role: ChatRole;
   content: string;
+  attachment?: {
+    name: string;
+    type: string;
+    data: string; // base64
+  };
   created_at: string;
 };
 

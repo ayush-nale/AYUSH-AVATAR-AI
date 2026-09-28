@@ -1,5 +1,6 @@
-import React, { RefObject } from "react";
+import React, { RefObject, useRef } from "react";
 import MicButton from "@/components/Voice/MicButton";
+import { Paperclip, X } from "lucide-react";
 
 export default function InputBar({
   input,
@@ -17,7 +18,39 @@ export default function InputBar({
   onTranscript: (t: string) => void;
   onListeningChange: (on: boolean) => void;
   inputRef?: RefObject<HTMLInputElement | null>;
+  attachedFile?: { name: string; type: string; data: string } | null;
+  setAttachedFile?: (file: { name: string; type: string; data: string } | null) => void;
 }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Optional: limit file size (e.g. 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File is too large. Please select a file under 5MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      if (result && setAttachedFile) {
+        // result is a data URL like "data:image/png;base64,iVBORw0KGgo..."
+        const base64Data = result.split(",")[1];
+        setAttachedFile({
+          name: file.name,
+          type: file.type,
+          data: base64Data
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+    // Reset input
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   return (
     <div className="input-bar-container" style={{ width: "100%", maxWidth: "800px", margin: "0 auto", padding: "0 24px" }}>
       <div 
@@ -33,12 +66,38 @@ export default function InputBar({
           boxShadow: "0 8px 32px rgba(157, 78, 221, 0.15)"
         }}
       >
-        <button className="focus-ring input-bar-btn" style={{ width: "44px", height: "44px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", color: "var(--muted)", transition: "all 0.2s" }}>
-          <span style={{ fontSize: "20px", opacity: 0.8 }}>📎</span>
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          style={{ display: "none" }} 
+          accept="image/*,.pdf" 
+          onChange={handleFileChange} 
+        />
+        <button 
+          className="focus-ring input-bar-btn" 
+          onClick={() => fileInputRef.current?.click()}
+          title="Attach a file"
+          style={{ width: "44px", height: "44px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", color: "var(--muted)", transition: "all 0.2s", cursor: "pointer" }}
+        >
+          <Paperclip size={20} className="hover:text-white" />
         </button>
         
-        <input 
-          ref={inputRef}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+          {attachedFile && (
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 8px", background: "rgba(168, 85, 247, 0.15)", borderRadius: "8px", marginBottom: "4px", width: "fit-content", maxWidth: "100%" }}>
+              <span style={{ fontSize: "12px", color: "var(--accent)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                📎 {attachedFile.name}
+              </span>
+              <button 
+                onClick={() => setAttachedFile && setAttachedFile(null)}
+                style={{ background: "transparent", border: "none", color: "var(--muted)", cursor: "pointer", display: "flex", alignItems: "center", padding: "2px" }}
+              >
+                <X size={12} />
+              </button>
+            </div>
+          )}
+          <input 
+            ref={inputRef}
           className="focus-ring"
           value={input} 
           onChange={e => setInput(e.target.value)} 
@@ -53,9 +112,10 @@ export default function InputBar({
             padding: "0 8px", 
             fontSize: "15px",
             lineHeight: 1.5,
-            height: "44px"
+            height: attachedFile ? "32px" : "44px"
           }}
         />
+        </div>
         
         <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
           <MicButton 

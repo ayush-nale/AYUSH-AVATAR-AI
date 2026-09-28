@@ -25,6 +25,7 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userSubtitle, setUserSubtitle] = useState("");
   const [aiSubtitle, setAiSubtitle] = useState("");
+  const [attachedFile, setAttachedFile] = useState<{name: string; type: string; data: string} | null>(null);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -90,8 +91,11 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
 
   async function sendMessage(text = input) {
     const clean = text.trim();
-    if (!clean || loading) return;
+    const currentAttachment = attachedFile;
+    if ((!clean && !currentAttachment) || loading) return;
+    
     setInput("");
+    setAttachedFile(null);
     setError("");
     setLoading(true);
     setAppState("thinking");
@@ -116,14 +120,28 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
       setConversations(c => [d.conversation, ...c]);
     }
     
-    const optimistic = { id: `temp-${Date.now()}`, conversation_id: id, user_id: user.id, role: "user" as const, content: clean, created_at: new Date().toISOString() };
+    }
+    
+    const optimistic = { 
+      id: `temp-${Date.now()}`, 
+      conversation_id: id, 
+      user_id: user.id, 
+      role: "user" as const, 
+      content: clean, 
+      attachment: currentAttachment ? { name: currentAttachment.name, type: currentAttachment.type, data: currentAttachment.data } : undefined,
+      created_at: new Date().toISOString() 
+    };
     setMessages(m => [...m, optimistic]);
 
     try {
       const r = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversationId: id, message: clean })
+        body: JSON.stringify({ 
+          conversationId: id, 
+          message: clean,
+          attachment: currentAttachment 
+        })
       });
       
       if (!r.ok || !r.body) {
@@ -492,6 +510,8 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
                   }
                 }}
                 onListeningChange={(on) => setAppState(on ? "listening" : loading ? "thinking" : "idle")}
+                attachedFile={attachedFile}
+                setAttachedFile={setAttachedFile}
               />
             </div>
           </div>

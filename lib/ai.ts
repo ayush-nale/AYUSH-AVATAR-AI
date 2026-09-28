@@ -41,7 +41,13 @@ export class GeminiAPIError extends Error {
   }
 }
 
-export async function* generateReplyStream(input: { message: string; recentMessages: Array<{ role: "user" | "assistant" | "system"; content: string }>; memories: string[]; adminInstructions?: string; }) {
+export async function* generateReplyStream(input: { 
+  message: string; 
+  recentMessages: Array<{ role: "user" | "assistant" | "system"; content: string }>; 
+  memories: string[]; 
+  adminInstructions?: string;
+  attachment?: { name: string; type: string; data: string };
+}) {
   const genAI = getClient();
   
   if (process.env.NODE_ENV === "development") {
@@ -87,7 +93,18 @@ export async function* generateReplyStream(input: { message: string; recentMessa
       history: validHistory,
     });
     
-    let resultStream = await chat.sendMessageStream({ message: input.message });
+    let parts: any[] = [];
+    if (input.message) parts.push({ text: input.message });
+    if (input.attachment) {
+      parts.push({
+        inlineData: {
+          data: input.attachment.data,
+          mimeType: input.attachment.type
+        }
+      });
+    }
+    
+    let resultStream = await chat.sendMessageStream(parts);
     
     let firstChunk = true;
     for await (const chunk of resultStream) {
