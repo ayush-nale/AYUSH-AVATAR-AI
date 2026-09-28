@@ -66,9 +66,9 @@ export default function ChatWindow({ messages, error, onSuggestionClick, display
       const opt = {
         margin:       0.5,
         filename:     'AI_Ayush_Document.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
+        image:        { type: 'jpeg' as const, quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' as const }
       };
       
       html2pdf().set(opt).from(element).save();

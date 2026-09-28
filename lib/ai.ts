@@ -104,7 +104,7 @@ export async function* generateReplyStream(input: {
       });
     }
     
-    let resultStream = await chat.sendMessageStream(parts);
+    let resultStream = await chat.sendMessageStream({ message: parts });
     
     let firstChunk = true;
     for await (const chunk of resultStream) {

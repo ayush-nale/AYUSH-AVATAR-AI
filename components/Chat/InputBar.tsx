@@ -9,7 +9,9 @@ export default function InputBar({
   onSend,
   onTranscript,
   onListeningChange,
-  inputRef
+  inputRef,
+  attachedFile,
+  setAttachedFile
 }: {
   input: string;
   setInput: (s: string) => void;
