@@ -13,7 +13,7 @@ const schema=z.object({
     name: z.string(),
     type: z.string(),
     data: z.string()
-  }).optional()
+  }).nullable().optional()
 }).refine(data => data.message.length > 0 || !!data.attachment, {
   message: "Either message or attachment must be provided"
 });
