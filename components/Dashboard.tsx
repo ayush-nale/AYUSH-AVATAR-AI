@@ -361,11 +361,12 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
       setExpression(expr as Expression);
     },
     (userText) => {
-      setUserSubtitle(userText);
-      setVoicePdfContent(null); // hide old pdf when user speaks again
+      // The Gemini API currently returns the model's transcription here.
+      // Strip out PDF tags in case the model hallucinates them.
+      setUserSubtitle(userText.replace(/\[PDF_START\]/gi, "").replace(/\[PDF_END\]/gi, "").trim());
     },
     (fullText) => {
-      setAiSubtitle(fullText);
+      setAiSubtitle(fullText.replace(/\[PDF_START\]/gi, "").replace(/\[PDF_END\]/gi, "").trim());
     },
     () => {
       // turn complete
