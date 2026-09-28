@@ -26,6 +26,7 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userSubtitle, setUserSubtitle] = useState("");
   const [aiSubtitle, setAiSubtitle] = useState("");
+  const [voicePdfContent, setVoicePdfContent] = useState<string | null>(null);
   const [attachedFile, setAttachedFile] = useState<{name: string; type: string; data: string} | null>(null);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -361,6 +362,7 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
     },
     (userText) => {
       setUserSubtitle(userText);
+      setVoicePdfContent(null); // hide old pdf when user speaks again
     },
     (fullText) => {
       setAiSubtitle(fullText);
@@ -368,6 +370,9 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
     () => {
       // turn complete
       setAiSubtitle("");
+    },
+    (markdown) => {
+      setVoicePdfContent(markdown);
     }
   );
 
@@ -513,22 +518,13 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
             <div className="subtitles-overlay">
                {userSubtitle && <p className="subtitle-user">"{userSubtitle}"</p>}
                {(() => {
-                 let displayAiSubtitle = aiSubtitle;
-                 let pdfContentMatch = null;
-                 if (aiSubtitle.includes('[PDF_START]')) {
-                   displayAiSubtitle = aiSubtitle.split('[PDF_START]')[0].trim();
-                   const pdfMatch = aiSubtitle.match(/\[PDF_START\]([\s\S]*?)(?:\[PDF_END\]|$)/);
-                   if (pdfMatch) {
-                     pdfContentMatch = pdfMatch[1];
-                   }
-                 }
                  return (
                    <>
-                     {displayAiSubtitle && <p className="subtitle-ai">{displayAiSubtitle}</p>}
-                     {pdfContentMatch && (
+                     {aiSubtitle && <p className="subtitle-ai">{aiSubtitle}</p>}
+                     {voicePdfContent && (
                         <div style={{ marginTop: "16px", display: "flex", justifyContent: "center" }}>
                           <button 
-                            onClick={() => handleDownloadPdf(pdfContentMatch)}
+                            onClick={() => handleDownloadPdf(voicePdfContent)}
                             className="focus-ring glass-panel glow-border"
                             style={{ padding: "12px 24px", borderRadius: "12px", background: "rgba(168, 85, 247, 0.2)", border: "1px solid rgba(168, 85, 247, 0.4)", color: "white", display: "flex", alignItems: "center", gap: "8px", fontWeight: 600, cursor: "pointer" }}
                           >

@@ -11,7 +11,8 @@ export function useLiveVoice(
   onExpressionChange?: (expr: string) => void,
   onUserTranscript?: (text: string) => void,
   onAiTranscriptChunk?: (text: string) => void,
-  onTurnComplete?: () => void
+  onTurnComplete?: () => void,
+  onPdfGenerated?: (markdown: string) => void
 ) {
   const [sessionState, setSessionState] = useState<"idle" | "connecting" | "connected" | "error">("idle");
   const [error, setError] = useState<string>("");
@@ -159,6 +160,27 @@ export function useLiveVoice(
                            }
                         }
                       }
+                      
+                      if (part.functionCall && part.functionCall.name === "generate_pdf") {
+                        const args = part.functionCall.args || {};
+                        if (args.markdown_content && onPdfGenerated) {
+                          onPdfGenerated(args.markdown_content);
+                        }
+                        
+                        if (sessionRef.current && sessionRef.current.sendToolResponse) {
+                           try {
+                             sessionRef.current.sendToolResponse({
+                               functionResponses: [{
+                                 id: part.functionCall.id || "1",
+                                 name: part.functionCall.name || "generate_pdf",
+                                 response: { result: "ok" }
+                               }]
+                             });
+                           } catch (e: any) { 
+                             console.error("Tool response error:", e);
+                           }
+                        }
+                      }
                    }
                 }
              }
@@ -172,6 +194,9 @@ export function useLiveVoice(
                       if (onExpressionChange) {
                         onExpressionChange(String(call.args.expression).toLowerCase());
                       }
+                    }
+                    if (call.name === "generate_pdf" && call.args && call.args.markdown_content) {
+                      if (onPdfGenerated) onPdfGenerated(String(call.args.markdown_content));
                     }
                   });
                   
@@ -192,6 +217,9 @@ export function useLiveVoice(
                   const args = topToolCall.args || {};
                   if (args.expression && onExpressionChange) {
                     onExpressionChange(String(args.expression).toLowerCase());
+                  }
+                  if (topToolCall.name === "generate_pdf" && args.markdown_content && onPdfGenerated) {
+                    onPdfGenerated(String(args.markdown_content));
                   }
                   
                   // Respond to the top-level toolCall
@@ -242,6 +270,19 @@ export function useLiveVoice(
                   }
                 },
                 required: ["expression"]
+              }
+            }, {
+              name: "generate_pdf",
+              description: "Call this function to generate a PDF document for the user. In Voice Mode, this is the ONLY way you should generate PDFs. Do NOT output raw markdown in your text response if you are generating a PDF, instead pass the markdown content into this function.",
+              parameters: {
+                type: "OBJECT" as any,
+                properties: {
+                  markdown_content: {
+                    type: "STRING" as any,
+                    description: "The full markdown content to be compiled into the PDF."
+                  }
+                },
+                required: ["markdown_content"]
               }
             }]
           }],
