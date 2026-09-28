@@ -35,7 +35,10 @@ export async function POST(req: Request) {
     }
     
     const parsed = schema.safeParse(body);
-    if (!parsed.success) return NextResponse.json({ error: "Invalid chat request" }, { status: 400 });
+    if (!parsed.success) {
+      console.error("Zod Validation Error:", JSON.stringify(parsed.error.format()));
+      return NextResponse.json({ error: "Invalid chat request" }, { status: 400 });
+    }
     const { conversationId, message, attachment } = parsed.data;
     
     const { data: conversation, error: e } = await supabase.from("conversations").select("id,user_id").eq("id", conversationId).eq("user_id", user.id).maybeSingle();
