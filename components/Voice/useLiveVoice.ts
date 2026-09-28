@@ -280,7 +280,7 @@ export function useLiveVoice(
         config: {
           systemInstruction: {
             parts: [{
-              text: SYSTEM_PROMPT + "\n\n" + (adminInstructions ? `ADMIN INSTRUCTIONS FOR THIS USER: ${adminInstructions}\n\n` : "") + "CRITICAL VOICE INSTRUCTIONS: You MUST call the `set_expression` tool to change your facial expression before you speak! Make sure to pass a valid emotion from the enum."
+              text: SYSTEM_PROMPT + "\n\n" + (adminInstructions ? `ADMIN INSTRUCTIONS FOR THIS USER: ${adminInstructions}\n\n` : "") + "CRITICAL VOICE INSTRUCTIONS:\n1. You MUST call the `set_expression` tool to change your facial expression before you speak! Make sure to pass a valid emotion from the enum.\n2. If the user asks for an image, you MUST call the `generate_image` tool. NEVER call `generate_pdf` for images."
             }]
           } as any,
           responseModalities: ["AUDIO"] as any,
