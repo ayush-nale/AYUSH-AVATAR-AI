@@ -37,7 +37,9 @@ export async function POST(req: Request) {
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
       console.error("Zod Validation Error:", JSON.stringify(parsed.error.format()));
-      return NextResponse.json({ error: "Invalid chat request" }, { status: 400 });
+      const firstError = parsed.error.errors[0];
+      const errorMsg = `Invalid request: ${firstError.message} at ${firstError.path.join('.')}`;
+      return NextResponse.json({ error: errorMsg }, { status: 400 });
     }
     const { conversationId, message, attachment } = parsed.data;
     
