@@ -8,6 +8,7 @@ import AvatarStage from "@/components/dashboard/AvatarStage";
 import ChatWindow from "@/components/Chat/ChatWindow";
 import InputBar from "@/components/Chat/InputBar";
 import { useLiveVoice } from "@/components/Voice/useLiveVoice";
+import { handleDownloadPdf } from "@/lib/pdf";
 import { PanelLeft, Mic, PhoneOff, Settings, Volume2, Sparkles, Send, Download, LogOut, MessageSquare } from "lucide-react";
 
 export default function Dashboard({ user, displayName, isAdmin, initialConversations }: { user: { id: string; email: string }; displayName: string; isAdmin?: boolean; initialConversations: Conversation[] }) {
@@ -511,7 +512,33 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
           {voiceMode && (userSubtitle || aiSubtitle) && (
             <div className="subtitles-overlay">
                {userSubtitle && <p className="subtitle-user">"{userSubtitle}"</p>}
-               {aiSubtitle && <p className="subtitle-ai">{aiSubtitle}</p>}
+               {(() => {
+                 let displayAiSubtitle = aiSubtitle;
+                 let pdfContentMatch = null;
+                 if (aiSubtitle.includes('[PDF_START]')) {
+                   displayAiSubtitle = aiSubtitle.split('[PDF_START]')[0].trim();
+                   const pdfMatch = aiSubtitle.match(/\[PDF_START\]([\s\S]*?)(?:\[PDF_END\]|$)/);
+                   if (pdfMatch) {
+                     pdfContentMatch = pdfMatch[1];
+                   }
+                 }
+                 return (
+                   <>
+                     {displayAiSubtitle && <p className="subtitle-ai">{displayAiSubtitle}</p>}
+                     {pdfContentMatch && (
+                        <div style={{ marginTop: "16px", display: "flex", justifyContent: "center" }}>
+                          <button 
+                            onClick={() => handleDownloadPdf(pdfContentMatch)}
+                            className="focus-ring glass-panel glow-border"
+                            style={{ padding: "12px 24px", borderRadius: "12px", background: "rgba(168, 85, 247, 0.2)", border: "1px solid rgba(168, 85, 247, 0.4)", color: "white", display: "flex", alignItems: "center", gap: "8px", fontWeight: 600, cursor: "pointer" }}
+                          >
+                            <Download size={18} /> Download Generated PDF
+                          </button>
+                        </div>
+                     )}
+                   </>
+                 );
+               })()}
             </div>
           )}
         </div>
