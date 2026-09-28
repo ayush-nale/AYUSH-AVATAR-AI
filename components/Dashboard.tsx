@@ -527,7 +527,7 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
                           <button 
                             onClick={() => handleDownloadPdf(voicePdfContent)}
                             className="focus-ring glass-panel glow-border"
-                            style={{ padding: "12px 24px", borderRadius: "12px", background: "rgba(168, 85, 247, 0.2)", border: "1px solid rgba(168, 85, 247, 0.4)", color: "white", display: "flex", alignItems: "center", gap: "8px", fontWeight: 600, cursor: "pointer" }}
+                            style={{ padding: "12px 24px", borderRadius: "12px", background: "rgba(168, 85, 247, 0.2)", border: "1px solid rgba(168, 85, 247, 0.4)", color: "white", display: "flex", alignItems: "center", gap: "8px", fontWeight: 600, cursor: "pointer", pointerEvents: "auto" }}
                           >
                             <Download size={18} /> Download Generated PDF
                           </button>
