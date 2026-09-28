@@ -27,6 +27,7 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
   const [userSubtitle, setUserSubtitle] = useState("");
   const [aiSubtitle, setAiSubtitle] = useState("");
   const [voicePdfContent, setVoicePdfContent] = useState<string | null>(null);
+  const [voiceImageUrl, setVoiceImageUrl] = useState<string | null>(null);
   const [attachedFile, setAttachedFile] = useState<{name: string; type: string; data: string} | null>(null);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -374,6 +375,12 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
     },
     (markdown) => {
       setVoicePdfContent(markdown);
+      setVoiceImageUrl(null); // clear image when showing pdf
+    },
+    (prompt) => {
+      // Use pollinations.ai for instant image generation
+      setVoiceImageUrl(`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=800&height=600&nologo=true`);
+      setVoicePdfContent(null); // clear pdf when showing image
     }
   );
 
@@ -531,6 +538,25 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
                           >
                             <Download size={18} /> Download Generated PDF
                           </button>
+                        </div>
+                     )}
+                     {voiceImageUrl && (
+                        <div style={{ marginTop: "16px", display: "flex", justifyContent: "center", pointerEvents: "auto" }}>
+                          <div className="glass-panel glow-border" style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid rgba(168, 85, 247, 0.4)", padding: "4px" }}>
+                            <img src={voiceImageUrl} alt="Generated UI" style={{ width: "100%", maxWidth: "400px", borderRadius: "12px", objectFit: "cover" }} />
+                            <div style={{ display: "flex", justifyContent: "center", marginTop: "8px", paddingBottom: "4px" }}>
+                               <a 
+                                 href={voiceImageUrl}
+                                 download="Generated_Image.jpg"
+                                 target="_blank"
+                                 rel="noreferrer"
+                                 className="focus-ring"
+                                 style={{ padding: "8px 16px", borderRadius: "8px", background: "rgba(168, 85, 247, 0.2)", color: "white", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", fontWeight: 500, cursor: "pointer", textDecoration: "none" }}
+                               >
+                                 <Download size={16} /> Open Full Image
+                               </a>
+                            </div>
+                          </div>
                         </div>
                      )}
                    </>

@@ -12,7 +12,8 @@ export function useLiveVoice(
   onUserTranscript?: (text: string) => void,
   onAiTranscriptChunk?: (text: string) => void,
   onTurnComplete?: () => void,
-  onPdfGenerated?: (markdown: string) => void
+  onPdfGenerated?: (markdown: string) => void,
+  onImageGenerated?: (prompt: string) => void
 ) {
   const [sessionState, setSessionState] = useState<"idle" | "connecting" | "connected" | "error">("idle");
   const [error, setError] = useState<string>("");
@@ -181,6 +182,27 @@ export function useLiveVoice(
                            }
                         }
                       }
+
+                      if (part.functionCall && part.functionCall.name === "generate_image") {
+                        const args = part.functionCall.args || {};
+                        if (args.image_prompt && onImageGenerated) {
+                          onImageGenerated(args.image_prompt);
+                        }
+                        
+                        if (sessionRef.current && sessionRef.current.sendToolResponse) {
+                           try {
+                             sessionRef.current.sendToolResponse({
+                               functionResponses: [{
+                                 id: part.functionCall.id || "2",
+                                 name: part.functionCall.name || "generate_image",
+                                 response: { result: "ok" }
+                               }]
+                             });
+                           } catch (e: any) { 
+                             console.error("Tool response error:", e);
+                           }
+                        }
+                      }
                    }
                 }
              }
@@ -197,6 +219,9 @@ export function useLiveVoice(
                     }
                     if (call.name === "generate_pdf" && call.args && call.args.markdown_content) {
                       if (onPdfGenerated) onPdfGenerated(String(call.args.markdown_content));
+                    }
+                    if (call.name === "generate_image" && call.args && call.args.image_prompt) {
+                      if (onImageGenerated) onImageGenerated(String(call.args.image_prompt));
                     }
                   });
                   
@@ -220,6 +245,9 @@ export function useLiveVoice(
                   }
                   if (topToolCall.name === "generate_pdf" && args.markdown_content && onPdfGenerated) {
                     onPdfGenerated(String(args.markdown_content));
+                  }
+                  if (topToolCall.name === "generate_image" && args.image_prompt && onImageGenerated) {
+                    onImageGenerated(String(args.image_prompt));
                   }
                   
                   // Respond to the top-level toolCall
@@ -283,6 +311,19 @@ export function useLiveVoice(
                   }
                 },
                 required: ["markdown_content"]
+              }
+            }, {
+              name: "generate_image",
+              description: "Call this function to generate an image or picture for the user. Pass a highly detailed prompt describing the image you want to generate. Do NOT write an image tag in your spoken text response, just call this function.",
+              parameters: {
+                type: "OBJECT" as any,
+                properties: {
+                  image_prompt: {
+                    type: "STRING" as any,
+                    description: "A very detailed, descriptive prompt for the AI image generator to create the perfect picture."
+                  }
+                },
+                required: ["image_prompt"]
               }
             }]
           }],

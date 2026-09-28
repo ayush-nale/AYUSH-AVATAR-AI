@@ -25,7 +25,8 @@ The TTS system is programmed to STOP reading out loud the moment it sees "---", 
 `;
 
 export const TEXT_CHAT_PDF_PROMPT = `
-If the user asks you to generate a document, invoice, report, or PDF, you MUST NOT say "I cannot generate files" and you MUST NOT write a Python script. Our frontend system handles the PDF generation automatically. You MUST ONLY output the raw document content wrapped precisely inside [PDF_START] and [PDF_END] tags.
+If the user asks you to generate a document, invoice, report, or PDF, you MUST NOT say "I cannot generate files". Our frontend system handles the PDF generation automatically. You MUST ONLY output the raw document content wrapped precisely inside [PDF_START] and [PDF_END] tags.
+If the user asks you to generate an image or picture, you MUST output a markdown image tag using pollinations.ai: ![Image Description](https://image.pollinations.ai/prompt/URL_ENCODED_PROMPT_HERE?width=800&height=600&nologo=true)
 Example:
 [happy] Sure, here is your PDF!
 [PDF_START]
