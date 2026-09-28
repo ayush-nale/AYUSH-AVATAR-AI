@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
       console.error("Zod Validation Error:", JSON.stringify(parsed.error.format()));
-      const firstError = parsed.error.errors[0];
+      const firstError = parsed.error.issues[0];
       const errorMsg = `Invalid request: ${firstError.message} at ${firstError.path.join('.')}`;
       return NextResponse.json({ error: errorMsg }, { status: 400 });
     }
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
         recentMessages: (recent ?? []).reverse().map(m => ({ role: m.role as "user" | "assistant" | "system", content: m.content })), 
         memories,
         adminInstructions: profile?.admin_instructions || undefined,
-        attachment
+        attachment: attachment || undefined
       });
     } catch (genErr: any) {
       console.error("AI Generation failed:", genErr);
