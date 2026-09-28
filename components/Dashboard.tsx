@@ -120,8 +120,6 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
       setConversations(c => [d.conversation, ...c]);
     }
     
-    }
-    
     const optimistic = { 
       id: `temp-${Date.now()}`, 
       conversation_id: id, 
