@@ -14,6 +14,15 @@ You MUST start your response with an expression tag in brackets, followed by a s
 Example: "[happy] Your actual response here"
 The expression MUST be one of: neutral, happy, sad, angry, surprised, thinking, confused
 Do not output JSON.
+
+If the user asks you to generate a document, invoice, report, or PDF, you MUST format your response by wrapping the document content precisely inside [PDF_START] and [PDF_END] tags.
+Example:
+Sure, here is your invoice!
+[PDF_START]
+# Invoice for Services
+**Amount:** $500
+**Date:** Today
+[PDF_END]
 `;
 
 let client: GoogleGenAI | null = null;

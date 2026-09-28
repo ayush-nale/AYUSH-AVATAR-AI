@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { ChatMessage } from "@/types/chat";
+import { Download, FileText } from "lucide-react";
 
 export default function ChatWindow({ messages, error, onSuggestionClick, displayName = "Ayush" }: { messages: ChatMessage[]; error: string; onSuggestionClick: (text: string) => void; displayName?: string }) {
   const endRef = useRef<HTMLDivElement>(null);
@@ -45,6 +46,36 @@ export default function ChatWindow({ messages, error, onSuggestionClick, display
       </div>
     );
   }
+
+  const handleDownloadPdf = async (pdfContent: string) => {
+    try {
+      // @ts-ignore
+      const html2pdf = (await import('html2pdf.js')).default;
+      const element = document.createElement('div');
+      
+      // Basic markdown to HTML conversion for the PDF
+      let htmlContent = pdfContent
+        .replace(/^# (.*$)/gim, '<h1 style="font-size: 24px; font-weight: bold; margin-bottom: 16px; color: #111;">$1</h1>')
+        .replace(/^## (.*$)/gim, '<h2 style="font-size: 20px; font-weight: bold; margin-top: 24px; margin-bottom: 12px; color: #222;">$1</h2>')
+        .replace(/^### (.*$)/gim, '<h3 style="font-size: 16px; font-weight: bold; margin-top: 20px; margin-bottom: 8px; color: #333;">$1</h3>')
+        .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+        .replace(/\n/gim, '<br/>');
+
+      element.innerHTML = `<div style="padding: 40px; font-family: Helvetica, Arial, sans-serif; color: #000; background: #fff; line-height: 1.6;">${htmlContent}</div>`;
+      
+      const opt = {
+        margin:       0.5,
+        filename:     'AI_Ayush_Document.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      
+      html2pdf().set(opt).from(element).save();
+    } catch (err) {
+      console.error("Failed to generate PDF:", err);
+    }
+  };
   
   return (
     <div ref={containerRef} style={{ width: "100%", maxWidth: "800px", margin: "0 auto", padding: "0", display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -75,7 +106,46 @@ export default function ChatWindow({ messages, error, onSuggestionClick, display
                   whiteSpace: "pre-wrap"
                 }}
               >
-                <div style={{ opacity: 0.9 }}>{m.content}</div>
+                {(() => {
+                  const content = m.content;
+                  const startIdx = content.indexOf("[PDF_START]");
+                  const endIdx = content.indexOf("[PDF_END]");
+                  
+                  if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+                    const before = content.substring(0, startIdx);
+                    const pdfText = content.substring(startIdx + 11, endIdx).trim();
+                    const after = content.substring(endIdx + 9);
+                    
+                    return (
+                      <div style={{ opacity: 0.9 }}>
+                        {before && <div>{before}</div>}
+                        
+                        <div style={{ margin: "16px 0", padding: "16px", borderRadius: "12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(168, 85, 247, 0.3)", display: "flex", flexDirection: "column", gap: "12px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "var(--accent)" }}>
+                            <FileText size={24} />
+                            <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff" }}>Generated Document</div>
+                          </div>
+                          <div style={{ fontSize: "13px", color: "var(--muted)", maxHeight: "100px", overflow: "hidden", textOverflow: "ellipsis", WebkitMaskImage: "linear-gradient(to bottom, black 50%, transparent)" }}>
+                            {pdfText}
+                          </div>
+                          <button 
+                            onClick={() => handleDownloadPdf(pdfText)}
+                            className="focus-ring"
+                            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", width: "100%", padding: "10px", background: "var(--accent)", color: "#000", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", marginTop: "4px", transition: "opacity 0.2s" }}
+                            onMouseOver={(e) => e.currentTarget.style.opacity = "0.9"}
+                            onMouseOut={(e) => e.currentTarget.style.opacity = "1"}
+                          >
+                            <Download size={16} strokeWidth={2.5} /> Download PDF
+                          </button>
+                        </div>
+                        
+                        {after && <div>{after}</div>}
+                      </div>
+                    );
+                  }
+                  
+                  return <div style={{ opacity: 0.9 }}>{content}</div>;
+                })()}
               </div>
               <div style={{ fontSize: "11px", color: "var(--muted)", marginTop: "8px", padding: "0 8px" }}>
                 {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
