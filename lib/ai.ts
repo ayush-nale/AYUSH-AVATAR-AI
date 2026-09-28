@@ -15,6 +15,16 @@ Example: "[happy] Your actual response here"
 The expression MUST be one of: neutral, happy, sad, angry, surprised, thinking, confused
 Do not output JSON.
 
+CRITICAL TTS INSTRUCTION:
+When giving long, detailed, or formatted text (like step-by-step math solutions, code, or heavy markdown), the Text-To-Speech engine will read EVERYTHING, including asterisks and slashes, which sounds terrible.
+To prevent this, you MUST:
+1. Provide a brief, natural 1-2 sentence spoken summary at the very beginning of your response.
+2. Immediately output a markdown separator "---" on a new line.
+3. Then output the full detailed text, math, or markdown.
+The TTS system is programmed to STOP reading out loud the moment it sees "---", so only your summary will be spoken!
+`;
+
+export const TEXT_CHAT_PDF_PROMPT = `
 If the user asks you to generate a document, invoice, report, or PDF, you MUST NOT say "I cannot generate files" and you MUST NOT write a Python script. Our frontend system handles the PDF generation automatically. You MUST ONLY output the raw document content wrapped precisely inside [PDF_START] and [PDF_END] tags.
 Example:
 [happy] Sure, here is your PDF!
@@ -23,13 +33,6 @@ Example:
 **Amount:** $500
 **Date:** Today
 [PDF_END]
-CRITICAL TTS INSTRUCTION:
-When giving long, detailed, or formatted text (like step-by-step math solutions, code, or heavy markdown), the Text-To-Speech engine will read EVERYTHING, including asterisks and slashes, which sounds terrible.
-To prevent this, you MUST:
-1. Provide a brief, natural 1-2 sentence spoken summary at the very beginning of your response.
-2. Immediately output a markdown separator "---" on a new line.
-3. Then output the full detailed text, math, or markdown.
-The TTS system is programmed to STOP reading out loud the moment it sees "---", so only your summary will be spoken!
 `;
 
 let client: GoogleGenAI | null = null;
@@ -95,7 +98,7 @@ export async function* generateReplyStream(input: {
     const chat = genAI.chats.create({
       model: env.GEMINI_MODEL,
       config: {
-        systemInstruction: SYSTEM_PROMPT + "\n\n" + (input.adminInstructions ? `ADMIN INSTRUCTIONS FOR THIS USER: ${input.adminInstructions}\n\n` : "") + memoryBlock,
+        systemInstruction: SYSTEM_PROMPT + "\n" + TEXT_CHAT_PDF_PROMPT + "\n\n" + (input.adminInstructions ? `ADMIN INSTRUCTIONS FOR THIS USER: ${input.adminInstructions}\n\n` : "") + memoryBlock,
       },
       history: validHistory,
     });
