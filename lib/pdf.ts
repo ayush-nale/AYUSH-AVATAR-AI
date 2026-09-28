@@ -1,7 +1,5 @@
 export const handleDownloadPdf = async (pdfContent: string) => {
   try {
-    alert("Starting PDF download... Please wait.");
-    
     // @ts-ignore
     const html2pdf = (await import('html2pdf.js')).default;
     const element = document.createElement('div');
@@ -16,9 +14,20 @@ export const handleDownloadPdf = async (pdfContent: string) => {
 
     element.innerHTML = `<div style="padding: 40px; font-family: Helvetica, Arial, sans-serif; color: #000; background: #fff; line-height: 1.6;">${htmlContent}</div>`;
     
+    // Try to extract a title from the first heading for the filename
+    let dynamicFilename = 'AI_Ayush_Document';
+    const titleMatch = pdfContent.match(/^#\s+(.*$)/m);
+    if (titleMatch && titleMatch[1]) {
+      // Clean up the title: remove special characters, replace spaces with hyphens
+      let cleanTitle = titleMatch[1].trim().replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
+      if (cleanTitle) {
+        dynamicFilename = `${cleanTitle}_ayushai`;
+      }
+    }
+
     const opt = {
       margin:       0.5,
-      filename:     'AI_Ayush_Document.pdf',
+      filename:     `${dynamicFilename}.pdf`,
       image:        { type: 'jpeg' as const, quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' as const }
