@@ -159,6 +159,7 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
       const ttsQueue: string[] = [];
       let isPlayingTTS = false;
       let isStreamDone = false;
+      let stopTTS = false;
       abortTTSRef.current = false;
       
       const playNextInQueue = async () => {
@@ -285,8 +286,23 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
                      const sentence = sentenceBuffer.slice(0, splitIndex).trim();
                      sentenceBuffer = sentenceBuffer.slice(splitIndex);
                      if (sentence) {
-                        ttsQueue.push(sentence);
-                        playNextInQueue();
+                        if (sentence.includes('---') || sentence.includes('[PDF_START]')) {
+                          stopTTS = true;
+                        }
+                        if (!stopTTS) {
+                          const cleaned = sentence
+                            .replace(/\$\$.*?\$\$/g, ' ') 
+                            .replace(/\$.*?\$/g, ' ') 
+                            .replace(/[*_#`~>|]/g, '') 
+                            .replace(/---/g, '')
+                            .replace(/\[PDF_START\]/gi, '')
+                            .replace(/\[PDF_END\]/gi, '')
+                            .trim();
+                          if (cleaned) {
+                            ttsQueue.push(cleaned);
+                            playNextInQueue();
+                          }
+                        }
                      }
                   }
                }
@@ -298,9 +314,24 @@ export default function Dashboard({ user, displayName, isAdmin, initialConversat
       }
       
       isStreamDone = true;
-      if (sentenceBuffer.trim()) {
-         ttsQueue.push(sentenceBuffer.trim());
-         playNextInQueue();
+      if (sentenceBuffer.trim() && !stopTTS) {
+         if (sentenceBuffer.includes('---') || sentenceBuffer.includes('[PDF_START]')) {
+           stopTTS = true;
+         }
+         if (!stopTTS) {
+           const cleaned = sentenceBuffer.trim()
+             .replace(/\$\$.*?\$\$/g, ' ') 
+             .replace(/\$.*?\$/g, ' ') 
+             .replace(/[*_#`~>|]/g, '') 
+             .replace(/---/g, '')
+             .replace(/\[PDF_START\]/gi, '')
+             .replace(/\[PDF_END\]/gi, '')
+             .trim();
+           if (cleaned) {
+             ttsQueue.push(cleaned);
+             playNextInQueue();
+           }
+         }
       } else if (ttsQueue.length === 0 && !isPlayingTTS) {
          setAppState("idle");
       }

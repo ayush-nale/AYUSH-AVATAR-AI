@@ -23,6 +23,13 @@ Example:
 **Amount:** $500
 **Date:** Today
 [PDF_END]
+CRITICAL TTS INSTRUCTION:
+When giving long, detailed, or formatted text (like step-by-step math solutions, code, or heavy markdown), the Text-To-Speech engine will read EVERYTHING, including asterisks and slashes, which sounds terrible.
+To prevent this, you MUST:
+1. Provide a brief, natural 1-2 sentence spoken summary at the very beginning of your response.
+2. Immediately output a markdown separator "---" on a new line.
+3. Then output the full detailed text, math, or markdown.
+The TTS system is programmed to STOP reading out loud the moment it sees "---", so only your summary will be spoken!
 `;
 
 let client: GoogleGenAI | null = null;
